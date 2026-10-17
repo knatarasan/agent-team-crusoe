@@ -13,8 +13,8 @@ from triage import config  # noqa: F401  (loads .env)
 
 DEFAULT_BASE_URL = "https://api.inference.crusoecloud.com/v1"
 DEFAULT_MODELS = {
-    "worker": "meta-llama/Llama-3.3-70B-Instruct",
-    "optimizer": "deepseek-ai/DeepSeek-V3-0324",
+    "worker": "openai/gpt-oss-120b",
+    "optimizer": "deepseek-ai/DeepSeek-V4-Pro",
 }
 
 

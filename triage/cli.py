@@ -23,14 +23,27 @@ def cmd_ping(args):
 
     client = OpenAI(base_url=base_url(), api_key=api_key())
     print(f"Crusoe endpoint: {base_url()}")
+    ids: list[str] = []
     try:
         ids = sorted(m.id for m in client.models.list())
         print("Models available to this key:\n  " + "\n  ".join(ids))
     except Exception as e:
         print(f"(could not list models: {e})")
+    failed = False
     for kind in ("worker", "optimizer"):
-        reply = chat_model(kind).invoke("Reply with the single word OK.")
-        print(f"{kind:9} {model_name(kind)} -> {reply.content.strip()[:40]!r}")
+        name = model_name(kind)
+        if ids and name not in ids:
+            print(f"{kind:9} {name} -> NOT AVAILABLE; set CRUSOE_{kind.upper()}_MODEL in .env to one of the ids above")
+            failed = True
+            continue
+        try:
+            reply = chat_model(kind).invoke("Reply with the single word OK.")
+            print(f"{kind:9} {name} -> {str(reply.content).strip()[:40]!r}")
+        except Exception as e:
+            print(f"{kind:9} {name} -> FAILED: {type(e).__name__}: {e}")
+            failed = True
+    if failed:
+        raise SystemExit(1)
 
 
 def cmd_prepare_gold(args):
