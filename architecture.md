@@ -1,6 +1,6 @@
 # Architecture: Version N+1 motor claims triage team
 
-Status: **draft for review**. Nothing is built yet. The open decisions are listed at the end.
+Status: **basic version built** (`triage/` package; see [README.md](README.md)). The gold answers come from `data/dataset.csv` (adjusters' decisions), not from an Oracle. The open decisions are listed at the end.
 
 **Goal:** an agent team on Crusoe Managed Inference that triages rear-end auto claims (see [plan.md](plan.md)). After each run it reviews its mistakes against adjusters' decisions and rewrites its own playbook. It keeps a change only if a measured score improves, and it proves the gain with a before-and-after score on claims it has never seen.
 
@@ -14,9 +14,9 @@ flowchart TB
     end
 
     subgraph Data["Data"]
-        GEN["Claim generator<br/>(facts × state × twists)"]
-        ORA["Oracle<br/>(senior adjuster rules → gold)"]
-        SPL[("train / val / test<br/>+ dataset.csv smoke set")]
+        CSV[("dataset.csv<br/>claims + adjuster gold text")]
+        ORA["Gold extractor<br/>(free text → structured, cached)"]
+        SPL[("train / val / test<br/>stratified by gold route")]
     end
 
     subgraph Team["Triage team (LangGraph)"]
@@ -29,7 +29,7 @@ flowchart TB
     SUP["Claims Supervisor<br/>(reflector / optimizer)"]
     REP["Reports<br/>scorecards, changelog, cost"]
 
-    GEN --> ORA --> SPL
+    CSV --> ORA --> SPL
     SPL -->|claim text| AG
     PB -->|rules by role + state| AG
     AG --> GR --> SC
@@ -39,7 +39,7 @@ flowchart TB
     SC --> REP
     AG -.calls.-> WM
     SUP -.calls.-> OM
-    GEN -.rewrites FNOL text.-> WM
+    ORA -.one-time extraction.-> OM
 ```
 
 ## 2. Triage team (one claim)
@@ -130,15 +130,15 @@ Each claim's score = 1 − penalty / max penalty. This fills the `evaluation` co
 | Triage team | 5 role agents, structured output | LangGraph `StateGraph`, Pydantic |
 | Playbook | Plain-English rules, versioned, rollback | YAML + git |
 | Guardrails | Sign-off on denials, injury to human, rule linter | Plain Python (deterministic) |
-| Oracle | Gold labels from the claims manual + CA/TX law | Plain Python (deterministic) |
-| Generator | Synthetic claims and splits; LLM writes the FNOL text | Python + worker model |
+| Dataset | `dataset.csv` rows → claims; stratified train / val / test | Python (`triage/dataset.py`) |
+| Gold extractor | Adjuster's free-text decision → structured gold, cached in `data/gold_structured.jsonl` for review | Optimizer model, one time (`triage/gold.py`) |
 | Scorer | Cost-weighted score, reports | Plain Python |
 | Supervisor | Reflect on failures, propose edits | Optimizer model |
 | Loop | Propose → validate → commit or reject | Python |
 
 ## 6. Where Crusoe fits
 
-- Serves **every model call**: the 5 agents per claim, the supervisor, and the FNOL text generator.
+- Serves **every model call**: the 5 agents per claim, the supervisor, and the one-time gold extraction.
 - The loop is **inference-heavy**: claims × agents × candidate edits × seeds, in every cycle. Cheap, fast open-model inference is what makes the loop affordable.
 - Two model tiers (a small worker and a strong optimizer) give a **score-per-dollar** story.
 
@@ -148,7 +148,7 @@ Each claim's score = 1 − penalty / max penalty. This fills the `evaluation` co
 2. **States:** CA + TX only (both at-fault), or add a no-fault state?
 3. **Claim inputs:** FNOL text + policy only, or also a police report and repair estimate?
 4. **What the loop may change:** playbook rules only, or also agent prompts, tools and team topology?
-5. **Gold labels:** a hand-written oracle (deterministic), or hand-labelled claims only?
+5. **Gold labels:** ~~oracle~~ decided: `dataset.csv` (extended to ~2,000 rows) is the answer key. Still open: add structured gold columns to the CSV directly, or keep the LLM extraction + human review of `gold_structured.jsonl`?
 6. **Models on Crusoe:** which worker and optimizer models? (Check availability and structured-output support.)
 7. **Tracing:** local JSONL, or LangSmith / Langfuse?
 8. **Acceptance gate:** score threshold, number of seeds, per-category tolerance.
