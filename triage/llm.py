@@ -1,15 +1,19 @@
 """Chat models served by Crusoe Managed Inference (OpenAI-compatible API), plus JSON helpers."""
 
 import json
+import logging
 import os
 import re
 import threading
+import time
 from typing import Literal
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from triage import config  # noqa: F401  (loads .env)
+
+log = logging.getLogger("triage.llm")
 
 DEFAULT_BASE_URL = "https://api.inference.crusoecloud.com/v1"
 DEFAULT_MODELS = {
@@ -86,15 +90,22 @@ def _content(msg) -> str:
     return c
 
 
-def invoke_json(llm, system: str, user: str, retries: int = 1):
+def invoke_json(llm, system: str, user: str, retries: int = 1, tag: str = ""):
     msgs = [SystemMessage(system), HumanMessage(user)]
+    model = getattr(llm, "model_name", type(llm).__name__)
     for attempt in range(retries + 1):
+        started = time.perf_counter()
         resp = llm.invoke(msgs)
-        USAGE.add(getattr(resp, "usage_metadata", None))
+        meta = getattr(resp, "usage_metadata", None) or {}
+        USAGE.add(meta)
+        log.debug("%s %s %.1fs in=%s out=%s", tag or "call", model, time.perf_counter() - started,
+                  meta.get("input_tokens", "?"), meta.get("output_tokens", "?"))
         text = _content(resp)
         try:
             return parse_json(text)
         except (ValueError, json.JSONDecodeError):
             if attempt == retries:
+                log.error("%s: no valid JSON after %d attempts; reply started: %r", tag, retries + 1, text[:200])
                 raise
+            log.warning("%s: reply was not valid JSON, retrying", tag)
             msgs += [AIMessage(text), HumanMessage("That was not valid JSON. Reply with only the JSON, nothing else.")]

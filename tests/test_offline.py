@@ -1,11 +1,10 @@
-"""Offline tests: no Crusoe calls. The loop test uses a stub team and stub supervisor."""
+"""Offline tests: no Crusoe calls. The run tests use a stub team and stub supervisor."""
 
 import pytest
 
 from triage import guardrails
-from triage.dataset import Claim, split
+from triage.dataset import Claim
 from triage.llm import parse_json
-from triage.loop import improve
 from triage.playbook import Playbook, Rule
 from triage.schemas import GoldDecision, TriageDecision
 from triage.scorer import score_claim
@@ -73,49 +72,6 @@ def test_playbook_filtering_and_edits():
         apply_edit(pb2, Edit(op="retire", rule_id="R9"), 3)
 
 
-def _claims(n: int) -> list[Claim]:
-    golds = [BASELINE, EXCLUDED, SWOOP, HIT]
-    return [Claim(str(i), "CA", f"claim {i} excluded" if golds[i % 4] is EXCLUDED else f"claim {i}", "gold",
-                  golds[i % 4]) for i in range(n)]
-
-
-def test_split_is_stratified_and_disjoint():
-    s = split(_claims(80))
-    ids = [set(c.id for c in s[k]) for k in ("train", "val", "test")]
-    assert not (ids[0] & ids[1] or ids[0] & ids[2] or ids[1] & ids[2])
-    for k in ("train", "val", "test"):
-        assert {c.gold.route for c in s[k]} == {"fast_track", "deny", "siu", "subrogation"}
-
-
-def test_loop_keeps_good_rule_and_rejects_overreach(tmp_path):
-    """Stub team obeys the playbook literally; the supervisor proposes one overreaching and one good rule."""
-
-    def team(claim: Claim, pb: Playbook) -> TriageDecision:
-        texts = " ".join(r.text for r in pb.active())
-        if "deny everything" in texts:
-            return TriageDecision(coverage="denied", route="deny", human_signoff=True)
-        if "excluded" in claim.description and "excluded driver" in texts:
-            return TriageDecision(coverage="denied", route="deny", human_signoff=True)
-        return NAIVE
-
-    def propose(fails, pb):
-        return [Edit(op="add", text="deny everything to be safe", role="coverage"),
-                Edit(op="add", text="Deny when an excluded driver was driving", role="coverage",
-                     source_claim_ids=[f["claim_id"] for f in fails[:2]]),
-                Edit(op="add", text="Send ZIP code 90210 claims to SIU", role="fraud")]
-
-    claims = _claims(40)
-    result = improve(claims, claims, Playbook(), team, propose, cycles=2, workers=2, playbook_dir=tmp_path,
-                     echo=lambda *_: None)
-    assert result.final.version == 1
-    assert [r.text for r in result.final.active()] == ["Deny when an excluded driver was driving"]
-    reasons = {d.edit: d.reason for d in result.log}
-    assert any("wrongful denials" in r for e, r in reasons.items() if "deny everything" in e)
-    assert any("protected attribute" in r for e, r in reasons.items() if "ZIP" in e)
-    assert result.val_history[-1] > result.val_history[0]
-    assert (tmp_path / "v1.yaml").exists()
-
-
 def test_langgraph_team_wiring_with_fake_model():
     """Fake chat model replies in graph order; checks routing, rule citation merge and guardrails."""
     from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
@@ -153,3 +109,76 @@ def test_denied_claim_skips_liability_and_fraud():
     llm = GenericFakeChatModel(messages=iter(AIMessage(r) for r in replies))
     d = make_triage_fn(llm)(Claim("2", "TX", "Excluded nephew was driving.", "gold"), Playbook())
     assert (d.coverage, d.route, d.human_signoff) == ("denied", "deny", True)
+
+
+def test_generality_linter_rejects_memorized_rules():
+    desc = ["Our insured rear-ended a sedan stopped at a red light at about 15 mph; no injuries and a police report was filed."]
+    assert guardrails.lint_rule("Claim 12 should be denied", desc)
+    assert guardrails.lint_rule("Deny policy GEI-CA-104512", desc)
+    assert guardrails.lint_rule("Pay when Party B is insured by Progressive", desc)
+    assert guardrails.lint_rule("If our insured rear-ended a sedan stopped at a red light at about 15 mph, fast-track", desc)
+    assert not guardrails.lint_rule("If the lead car was lawfully stopped and nobody is hurt, fast-track", desc)
+
+
+def test_instruct_edit_sets_role_prompt_addon():
+    pb = apply_edit(Playbook(), Edit(op="instruct", role="coverage", text="Always compare dates with the grace period."), 1)
+    assert pb.role_instructions == {"coverage": "Always compare dates with the grace period."}
+    assert "grace period" in pb.render("coverage", "TX") and pb.render("liability", "TX") == ""
+
+
+# --- run-by-run mechanism -------------------------------------------------------------------------
+
+def _claims() -> list[Claim]:
+    golds = [BASELINE, EXCLUDED, SWOOP, HIT]
+    return [Claim(str(i), "CA", "excluded nephew was driving" if golds[i % 4] is EXCLUDED else f"rear-end case {i}",
+                  "gold", golds[i % 4]) for i in range(20)]
+
+
+def _team(claim: Claim, pb: Playbook) -> TriageDecision:
+    """Stub team that obeys the config literally."""
+    texts = " ".join(r.text for r in pb.active()) + " " + " ".join(pb.role_instructions.values())
+    if "deny everything" in texts:
+        return TriageDecision(coverage="denied", route="deny", human_signoff=True)
+    if "excluded" in claim.description and "excluded driver" in texts:
+        return TriageDecision(coverage="denied", route="deny", human_signoff=True)
+    return NAIVE
+
+
+def test_runs_improve_keep_best_and_roll_back(tmp_path):
+    from triage import playbook as pbmod
+    from triage.runs import history_report, load_state, read_history, run_once
+
+    pb_dir, runs_dir = tmp_path / "playbook", tmp_path / "runs"
+    pbmod.save(Playbook(), pb_dir)
+    proposals = iter([
+        [Edit(op="add", text="Deny when an excluded driver was driving", role="coverage"),
+         Edit(op="add", text="Send claim 7 to SIU", role="fraud")],                 # second one: linter rejects
+        [Edit(op="instruct", role="coverage", text="When unsure, deny everything to be safe")],  # overreach
+        [Edit(op="add", text="Pay collision and pursue subrogation when our insured was hit", role="liability")],
+    ])
+    seen_history: list[list] = []
+
+    def propose(fails, pb, history):
+        seen_history.append(list(history))
+        return next(proposals)
+
+    kw = dict(threshold=0.02, workers=2, runs_dir=runs_dir, playbook_dir=pb_dir)
+    r1 = run_once(_claims(), _team, propose, **kw)
+    r2 = run_once(_claims(), _team, propose, **kw)
+    r3 = run_once(_claims(), _team, propose, **kw)
+
+    assert (r1["status"], r2["status"], r3["status"]) == ("baseline", "kept", "rolled back")
+    assert r2["avg_score"] > r1["avg_score"] and r3["wrongful_denials"] > 0
+    state = load_state(runs_dir)
+    assert state["best"]["version"] == 1  # the excluded-driver rule survives; the overreach was rolled back
+    assert seen_history[2][-1]["result"] == "rolled back"  # supervisor sees what failed
+    nxt = pbmod.load(state["next_version"], pb_dir)  # proposed on top of v1, not on top of the bad v2
+    assert [r.text for r in nxt.active()][0] == "Deny when an excluded driver was driving"
+    assert "deny everything" not in " ".join(nxt.role_instructions.values())
+
+    assert [h["run"] for h in read_history(runs_dir)] == ["1", "2", "3"]
+    for f in ("config.yaml", "results.csv", "summary.json", "changes.md", "failures.json"):
+        assert (runs_dir / "run_002" / f).exists()
+    assert "names a specific claim" in (runs_dir / "run_001" / "changes.md").read_text()
+    report = history_report(runs_dir, tmp_path / "history.md")
+    assert "xychart-beta" in report and "rolled back" in report

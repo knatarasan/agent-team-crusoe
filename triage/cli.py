@@ -1,19 +1,15 @@
-"""Command line: ping | prepare-gold | eval | improve | compare."""
+"""Command line: ping | prepare-gold | run | history | eval."""
 
 import argparse
 import json
+import logging
 
 from triage import playbook as pbmod
-from triage.config import REPORTS_DIR, WORKERS
-from triage.dataset import attach_gold, load_claims, split
+from triage.config import REPORTS_DIR, RUNS_DIR, WORKERS
+from triage.dataset import attach_gold, load_claims
+from triage.log import setup_logging
 
-
-def _splits(seed: int):
-    return split(attach_gold(load_claims()), seed)
-
-
-def _claims_for(name: str, seed: int):
-    return attach_gold(load_claims()) if name == "all" else _splits(seed)[name]
+log = logging.getLogger("triage.cli")
 
 
 def cmd_ping(args):
@@ -55,68 +51,48 @@ def cmd_prepare_gold(args):
     print("Review that file: it is the answer key the team is scored against. Usage:", USAGE.snapshot())
 
 
-def cmd_eval(args):
+def cmd_run(args):
     from triage.agents import make_triage_fn
-    from triage.evaluate import evaluate, write_outputs
     from triage.llm import chat_model
-
-    claims = _claims_for(args.split, args.seed)
-    pb = pbmod.load(args.version if args.version is not None else pbmod.latest_version())
-    report = evaluate(claims, pb, make_triage_fn(chat_model("worker")), args.workers)
-    csv_path, json_path = write_outputs(claims, report, pb, args.split)
-    print(json.dumps({"playbook": f"v{pb.version}", "split": args.split, **report.summary()}, indent=2))
-    print(f"Scored CSV: {csv_path}\nReport: {json_path}")
-
-
-def cmd_improve(args):
-    from triage.agents import make_triage_fn
-    from triage.llm import USAGE, chat_model
-    from triage.loop import improve
+    from triage.runs import history_report, run_once
     from triage.supervisor import make_propose_fn
 
-    s = _splits(args.seed)
-    start = pbmod.load(args.start if args.start is not None else pbmod.latest_version())
-    result = improve(s["train"], s["val"], start, make_triage_fn(chat_model("worker")),
-                     make_propose_fn(chat_model("optimizer", temperature=0.3), args.k),
-                     cycles=args.cycles, threshold=args.threshold, workers=args.workers)
-    print(f"\nFinal playbook: v{result.final.version} | validation history {[round(x, 3) for x in result.val_history]}")
-    print("Usage:", USAGE.snapshot(), f"\nLog: {REPORTS_DIR / 'improvement_log.json'}")
+    from triage.llm import model_name
+
+    claims = attach_gold(load_claims())
+    log.info("loaded %d claims | worker %s | supervisor %s | %d run(s) | threshold %.2f | k %d",
+             len(claims), model_name("worker"), model_name("optimizer"), args.times, args.threshold, args.k)
+    triage_fn = make_triage_fn(chat_model("worker"))
+    propose_fn = make_propose_fn(chat_model("optimizer", temperature=0.3), args.k)
+    for _ in range(args.times):
+        run_once(claims, triage_fn, propose_fn, threshold=args.threshold, workers=args.workers)
+    history_report()
+    log.info("history: %s | chart: %s", RUNS_DIR / "history.csv", REPORTS_DIR / "history.md")
 
 
-def cmd_compare(args):
+def cmd_history(args):
+    from triage.runs import history_report
+
+    print(history_report())
+
+
+def cmd_eval(args):
     from triage.agents import make_triage_fn
-    from triage.evaluate import evaluate, write_outputs
+    from triage.evaluate import evaluate, write_results_csv
     from triage.llm import USAGE, chat_model
 
-    claims = _claims_for(args.split, args.seed)
-    triage_fn = make_triage_fn(chat_model("worker"))
-    after_v = args.after if args.after is not None else pbmod.latest_version()
-    rows = {}
-    for v in (args.before, after_v):
-        pb = pbmod.load(v)
-        report = evaluate(claims, pb, triage_fn, args.workers)
-        write_outputs(claims, report, pb, args.split)
-        rows[f"v{v}"] = report.summary()
-    before, after = rows[f"v{args.before}"], rows[f"v{after_v}"]
-    lines = [f"# Before / after on `{args.split}` ({before['claims']} claims)", "",
-             f"| Metric | v{args.before} | v{after_v} |", "|---|---|---|"]
-    for k in ("cost_weighted_score", "exact_match", "wrongful_denials", "straight_through_rate", "siu_hit_rate",
-              "subrogation_caught", "errors"):
-        lines.append(f"| {k} | {before[k]} | {after[k]} |")
-    lines += ["", "| Category (gold route) | before | after |", "|---|---|---|"]
-    for cat in sorted(set(before["by_category"]) | set(after["by_category"])):
-        lines.append(f"| {cat} | {before['by_category'].get(cat, '-')} | {after['by_category'].get(cat, '-')} |")
-    lines += ["", f"Crusoe usage: {USAGE.snapshot()}"]
-    REPORTS_DIR.mkdir(exist_ok=True)
-    out = REPORTS_DIR / f"before_after_{args.split}.md"
-    out.write_text("\n".join(lines) + "\n")
-    print("\n".join(lines) + f"\n\nWritten to {out}")
+    claims = attach_gold(load_claims())
+    pb = pbmod.load(args.version if args.version is not None else pbmod.latest_version())
+    report = evaluate(claims, pb, make_triage_fn(chat_model("worker")), args.workers)
+    path = write_results_csv(claims, report, RUNS_DIR / f"eval_v{pb.version}.csv")
+    print(json.dumps({"config": f"v{pb.version}", **report.summary(), "usage": USAGE.snapshot()}, indent=2))
+    print(f"Scored CSV: {path}")
 
 
 def main(argv=None):
     p = argparse.ArgumentParser(prog="triage", description=__doc__)
     p.add_argument("--workers", type=int, default=WORKERS, help="parallel claims")
-    p.add_argument("--seed", type=int, default=42, help="split seed")
+    p.add_argument("-v", "--verbose", action="store_true", help="also log every agent's output and each Crusoe call")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("ping", help="check Crusoe access and list models").set_defaults(fn=cmd_ping)
@@ -125,25 +101,20 @@ def main(argv=None):
     g.add_argument("--force", action="store_true", help="re-extract every row")
     g.set_defaults(fn=cmd_prepare_gold)
 
-    e = sub.add_parser("eval", help="score one playbook version on a split")
-    e.add_argument("--version", type=int, help="playbook version (default: latest)")
-    e.add_argument("--split", choices=["train", "val", "test", "all"], default="test")
+    r = sub.add_parser("run", help="one improvement run on all claims: score, keep or roll back, propose next")
+    r.add_argument("--times", type=int, default=1, help="number of runs in a row")
+    r.add_argument("--k", type=int, default=3, help="max edits the supervisor proposes per run")
+    r.add_argument("--threshold", type=float, default=0.02, help="score gain over the best run needed to keep")
+    r.set_defaults(fn=cmd_run)
+
+    sub.add_parser("history", help="run-by-run table and chart -> reports/history.md").set_defaults(fn=cmd_history)
+
+    e = sub.add_parser("eval", help="score one config version on all claims (no learning)")
+    e.add_argument("--version", type=int, help="config version (default: latest)")
     e.set_defaults(fn=cmd_eval)
 
-    i = sub.add_parser("improve", help="run the self-improvement loop")
-    i.add_argument("--start", type=int, help="starting playbook version (default: latest)")
-    i.add_argument("--cycles", type=int, default=3)
-    i.add_argument("--k", type=int, default=3, help="candidate edits per cycle")
-    i.add_argument("--threshold", type=float, default=0.01, help="minimum validation gain to accept an edit")
-    i.set_defaults(fn=cmd_improve)
-
-    c = sub.add_parser("compare", help="before/after report for two playbook versions")
-    c.add_argument("--before", type=int, default=0)
-    c.add_argument("--after", type=int, help="default: latest")
-    c.add_argument("--split", choices=["train", "val", "test", "all"], default="test")
-    c.set_defaults(fn=cmd_compare)
-
     args = p.parse_args(argv)
+    setup_logging(args.verbose)
     args.fn(args)
 
 

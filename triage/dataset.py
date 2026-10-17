@@ -1,18 +1,13 @@
-"""Load data/dataset.csv, attach structured gold, and split into train / val / test."""
+"""Load data/dataset.csv and attach structured gold. Every run uses all rows; there is no split."""
 
 import csv
 import hashlib
 import json
-import random
-import sys
-from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
 from triage.config import DATA_CSV, GOLD_CACHE
 from triage.schemas import GoldDecision
-
-SMOKE_THRESHOLD = 30  # below this many claims, splits are not meaningful
 
 
 @dataclass
@@ -64,24 +59,3 @@ def attach_gold(claims: list[Claim], path: Path = GOLD_CACHE) -> list[Claim]:
         c.gold = GoldDecision.model_validate(cache[c.id]["gold"])
     return claims
 
-
-def split(claims: list[Claim], seed: int = 42, ratios=(0.5, 0.25, 0.25)) -> dict[str, list[Claim]]:
-    """Stratified by gold route so rare twists land in every split. Tiny datasets use every claim everywhere."""
-    if len(claims) < SMOKE_THRESHOLD:
-        print(f"[warn] only {len(claims)} claims: smoke mode, train = val = test. "
-              "Before/after scores are not a real held-out result.", file=sys.stderr)
-        return {"train": claims, "val": claims, "test": claims}
-    groups: dict[str, list[Claim]] = defaultdict(list)
-    for c in claims:
-        groups[c.gold.route if c.gold else "unknown"].append(c)
-    out = {"train": [], "val": [], "test": []}
-    rng = random.Random(seed)
-    for _, group in sorted(groups.items()):
-        group = sorted(group, key=lambda c: _sort_key(c.id))
-        rng.shuffle(group)
-        n_train = round(len(group) * ratios[0])
-        n_val = round(len(group) * ratios[1])
-        out["train"] += group[:n_train]
-        out["val"] += group[n_train : n_train + n_val]
-        out["test"] += group[n_train + n_val :]
-    return out

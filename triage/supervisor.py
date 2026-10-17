@@ -1,4 +1,4 @@
-"""Claims Supervisor: reads the team's mistakes and proposes playbook edits."""
+"""Claims Supervisor: reads the team's mistakes and past edits, proposes the next config changes."""
 
 import json
 from typing import Callable, Literal
@@ -14,7 +14,7 @@ MAX_FAILURES_SHOWN = 15
 
 
 class Edit(BaseModel):
-    op: Literal["add", "edit", "retire"]
+    op: Literal["add", "edit", "retire", "instruct"]
     rule_id: str | None = None  # required for edit / retire
     text: str = ""
     role: Role = "decider"
@@ -23,26 +23,36 @@ class Edit(BaseModel):
     source_claim_ids: list[str] = Field(default_factory=list)
 
     def describe(self) -> str:
+        if self.op == "instruct":
+            return f"instruct [{self.role}] {self.text}"
         target = f" {self.rule_id}" if self.rule_id else ""
         return f"{self.op}{target} [{self.role}/{self.state}] {self.text}".strip()
 
 
-ProposeFn = Callable[[list[dict], Playbook], list[Edit]]
+ProposeFn = Callable[[list[dict], Playbook, list[dict]], list[Edit]]
 
 SYSTEM = """You are the claims supervisor for an auto claims triage team made of these agents: {roles}.
-Below are claims where the team's decision differed from the senior adjuster's final decision, plus the current playbook.
-Work out the root causes, then propose up to {k} independent playbook edits that would fix them.
+Below are the claims the team got wrong in its latest run compared with the senior adjuster's final decision,
+the current team config (house rules and per-role instructions), and the history of edits you tried before.
+Work out the root causes, then propose up to {k} edits for the next run.
+
+Edit types:
+- "add": a new house rule for one role (optionally scoped to state CA or TX).
+- "edit": rewrite an existing rule (give rule_id).
+- "retire": remove an existing rule that caused mistakes (give rule_id).
+- "instruct": replace the extra instructions for one role (text = the full new instructions for that role).
 
 Rules for good edits:
-- Each rule is one or two sentences of plain English a claims supervisor can approve.
-- Make rules general (about facts and patterns), never about a specific claim number.
-- Give each rule to the agent role that makes that call, and scope it to a state (CA or TX) only if the law differs by state.
-- Prefer fixing the most expensive mistakes first: wrongful denial > missed fraud / wrongful payment > injury fast-tracked > missed subrogation > the rest.
-- You may edit or retire an existing rule if it caused mistakes.
+- Plain English a claims supervisor can approve: one or two sentences per rule.
+- General patterns only. Never mention claim numbers, policy numbers, dates, carrier names or copy claim wording.
+- Give each rule to the agent role that makes that call; scope to CA or TX only when the law differs by state.
+- Fix the most expensive mistakes first: wrongful denial > missed fraud / wrongful payment > injury fast-tracked
+  > missed subrogation > the rest.
+- Learn from history: do not re-propose edits that were rolled back; build on edits that were kept.
 - Never use protected attributes or proxies for them (ZIP code, neighbourhood, race, gender, age, religion, credit score).
 
 Reply with JSON only:
-{{"edits": [{{"op": "add" | "edit" | "retire", "rule_id": "R<n>" or null, "text": str,
+{{"edits": [{{"op": "add" | "edit" | "retire" | "instruct", "rule_id": "R<n>" or null, "text": str,
   "role": one of {roles}, "state": "CA" | "TX" | "all", "rationale": str, "source_claim_ids": [str]}}]}}"""
 
 
@@ -64,12 +74,17 @@ def failures(claims: list[Claim], report: Report) -> list[dict]:
 
 
 def make_propose_fn(llm, k: int = 3) -> ProposeFn:
-    def propose(fails: list[dict], playbook: Playbook) -> list[Edit]:
+    def propose(fails: list[dict], playbook: Playbook, history: list[dict]) -> list[Edit]:
         system = SYSTEM.format(roles=list(ROLES), k=k)
-        rules = [r.model_dump(include={"id", "text", "role", "state"}) for r in playbook.active()]
-        user = (f"Current playbook (v{playbook.version}):\n{json.dumps(rules, indent=1)}\n\n"
-                f"Mistakes ({len(fails)} total, worst first):\n{json.dumps(fails[:MAX_FAILURES_SHOWN], indent=1)}")
-        out = invoke_json(llm, system, user)
+        config = {
+            "rules": [r.model_dump(include={"id", "text", "role", "state"}) for r in playbook.active()],
+            "role_instructions": playbook.role_instructions,
+        }
+        user = (f"Current config (v{playbook.version}):\n{json.dumps(config, indent=1)}\n\n"
+                f"Edit history (oldest first):\n{json.dumps(history[-10:], indent=1)}\n\n"
+                f"Mistakes in the latest run ({len(fails)} claims, worst first):\n"
+                f"{json.dumps(fails[:MAX_FAILURES_SHOWN], indent=1)}")
+        out = invoke_json(llm, system, user, tag="supervisor")
         items = out.get("edits", []) if isinstance(out, dict) else out
         edits = []
         for item in items[:k]:
@@ -85,6 +100,9 @@ def make_propose_fn(llm, k: int = 3) -> ProposeFn:
 def apply_edit(playbook: Playbook, edit: Edit, new_version: int) -> Playbook:
     pb = playbook.model_copy(deep=True)
     pb.version = new_version
+    if edit.op == "instruct":
+        pb.role_instructions[edit.role] = edit.text
+        return pb
     if edit.op == "add":
         pb.rules.append(Rule(id=pb.next_rule_id(), text=edit.text, role=edit.role, state=edit.state,
                              source_claim_ids=edit.source_claim_ids, added_in=new_version))

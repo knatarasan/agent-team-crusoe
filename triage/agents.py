@@ -4,6 +4,7 @@ Each agent's system prompt = day-1 base prompt + the playbook rules for its role
 """
 
 import json
+import logging
 from typing import Callable, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -13,6 +14,8 @@ from triage.dataset import Claim
 from triage.llm import invoke_json
 from triage.playbook import Playbook, Role
 from triage.schemas import TriageDecision
+
+log = logging.getLogger("triage.team")
 
 BASE_PROMPTS: dict[Role, str] = {
     "intake": """You are the intake clerk on a US auto insurer's claims team.
@@ -56,23 +59,37 @@ def _user_message(state: TeamState) -> str:
     return f"Claim {c['id']} | State: {c['state']}\nFNOL: {c['description']}\n\nNotes from colleagues so far:\n{notes}"
 
 
+def _compact(out: dict) -> str:
+    """One-line view of an agent's JSON for logs: drop free text, keep the calls it made."""
+    keep = {k: v for k, v in out.items() if k not in ("reason", "summary", "facts", "rationale")} if isinstance(out, dict) else out
+    return json.dumps(keep, separators=(",", ":"))
+
+
 def build_team(llm, playbook: Playbook):
     def agent(role: Role):
         def run(state: TeamState) -> TeamState:
+            cid = state["claim"]["id"]
             system = BASE_PROMPTS[role] + playbook.render(role, state["claim"]["state"])
-            out = invoke_json(llm, system, _user_message(state))
+            out = invoke_json(llm, system, _user_message(state), tag=f"#{cid} {role}")
+            log.debug("#%s %-9s -> %s", cid, role, _compact(out))
             return {"notes": {**state.get("notes", {}), role: out}}
 
         return run
 
     def decide(state: TeamState) -> TeamState:
+        cid = state["claim"]["id"]
         system = BASE_PROMPTS["decider"] + playbook.render("decider", state["claim"]["state"])
-        decision = TriageDecision.model_validate(invoke_json(llm, system, _user_message(state)))
+        decision = TriageDecision.model_validate(invoke_json(llm, system, _user_message(state), tag=f"#{cid} decider"))
         notes = state.get("notes", {})
         cited = {r for n in notes.values() if isinstance(n, dict) for r in n.get("rules_cited", []) or []}
         decision.rules_cited = sorted(cited | set(decision.rules_cited))
         injury = bool(notes.get("intake", {}).get("injury"))
-        return {"decision": guardrails.enforce(decision, injury)}
+        final = guardrails.enforce(decision, injury)
+        if final.route != decision.route or final.human_signoff != decision.human_signoff:
+            log.debug("#%s guardrail  -> route %s->%s, sign-off %s->%s", cid, decision.route, final.route,
+                      decision.human_signoff, final.human_signoff)
+        log.debug("#%s decider   -> %s | rules %s", cid, final.brief(), final.rules_cited or "-")
+        return {"decision": final}
 
     def after_coverage(state: TeamState) -> str:
         return "liability" if state["notes"].get("coverage", {}).get("coverage") == "covered" else "decider"

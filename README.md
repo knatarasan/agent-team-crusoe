@@ -1,36 +1,56 @@
 # Version N+1: a self-improving claims triage team on Crusoe
 
-A LangGraph agent team (Intake → Coverage → Liability → Fraud → Decider) triages rear-end auto claims. A Claims Supervisor studies the team's mistakes and edits a plain-English playbook. An edit is kept only if it raises the cost-weighted score on validation claims. See [plan.md](plan.md) for the business case and [architecture.md](architecture.md) for the design.
+A LangGraph agent team (Intake → Coverage → Liability → Fraud → Decider) triages rear-end auto claims. After every run over the whole dataset, a Claims Supervisor studies the mistakes and edits the team's config: plain-English house rules plus per-role prompt add-ons. The next run measures those edits. They're kept if the score improves and rolled back if not. See [plan.md](plan.md) for the business case and [architecture.md](architecture.md) for the design.
 
 ## Setup
 
 ```bash
 uv sync
-cp .env.example .env        # add CRUSOE_API_KEY; confirm base URL and model ids
-uv run triage ping          # lists models your key can use, says hello to both
+cp .env.example .env        # add CRUSOE_API_KEY
+uv run triage ping          # lists models your key can use and says hello to both
+uv run triage prepare-gold  # free-text gold -> data/gold_structured.jsonl (review it!)
 ```
 
 ## Run
 
 ```bash
-uv run triage prepare-gold                  # free-text gold -> data/gold_structured.jsonl (review it!)
-uv run triage eval --version 0 --split test # day-1 score; fills agent_outcome + evaluation in runs/*.csv
-uv run triage improve --cycles 3 --k 3      # writes playbook/v1.yaml, v2.yaml ... + reports/improvement_log.json
-uv run triage compare --before 0 --split test   # before/after table -> reports/before_after_test.md
-uv run pytest                               # offline tests (no Crusoe calls)
+uv run triage run              # run 1: baseline with config v0, then proposes v1
+uv run triage run --times 3    # runs 2-4: each measures the previous proposal, keeps or rolls back
+uv run triage -v run           # also log every agent's output and each Crusoe call (latency, tokens)
+uv run triage history          # run-by-run table + chart -> reports/history.md
+uv run triage eval --version 2 # score any config on all claims, no learning
+uv run pytest                  # offline tests (no Crusoe calls)
 ```
 
-With fewer than 30 rows in `data/dataset.csv`, train, validation and test are the same claims (smoke mode). The pipeline runs, but the before-and-after result isn't a held-out result until the dataset grows.
+Options for `run`: `--k 3` caps the edits proposed per run, and `--threshold 0.02` sets the score gain over the best run needed to keep a config.
+
+To start over, delete `runs/` and every `playbook/vN.yaml` except `v0.yaml`.
+
+## What each run writes
+
+```
+runs/
+  run_001/  config.yaml    the config this run measured
+            results.csv    all claims with agent_outcome + evaluation filled in
+            summary.json   scores, per-category, KPIs, Crusoe token usage
+            changes.md     what was tested, kept or rolled back, what's proposed next
+            failures.json  the mistakes the supervisor learns from
+  history.csv              one row per run: the improvement curve
+  state.json               best run so far, next config, edit history
+playbook/vN.yaml           every proposed config (rules + role prompt add-ons)
+reports/history.md         chart of avg score and exact match per run
+```
 
 ## Layout
 
 | Path | What |
 |---|---|
 | `triage/llm.py` | Crusoe client (`ChatOpenAI` → Crusoe base URL), JSON parsing, token usage |
-| `triage/agents.py` | LangGraph team and day-1 base prompts |
-| `triage/playbook.py`, `playbook/vN.yaml` | Versioned rules; roll back by loading an older version |
+| `triage/agents.py` | LangGraph team and fixed day-1 base prompts |
+| `triage/playbook.py` | Versioned config: rules + role prompt add-ons |
 | `triage/guardrails.py` | Sign-off on denials, injury never fast-tracked, rule linter |
-| `triage/dataset.py`, `triage/gold.py` | CSV loading, structured gold cache, stratified splits |
+| `triage/dataset.py`, `triage/gold.py` | CSV loading, structured gold cache |
 | `triage/scorer.py` | Cost-weighted score and KPIs |
-| `triage/supervisor.py`, `triage/loop.py` | Propose edits → validate → accept or reject |
-| `triage/cli.py` | `ping`, `prepare-gold`, `eval`, `improve`, `compare` |
+| `triage/supervisor.py` | Proposes edits from mistakes and the edit history |
+| `triage/runs.py` | Run → keep or roll back → propose next; history and chart |
+| `triage/cli.py` | `ping`, `prepare-gold`, `run`, `history`, `eval` |
