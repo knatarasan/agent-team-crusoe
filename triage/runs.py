@@ -15,6 +15,7 @@ from pathlib import Path
 from triage import guardrails, playbook as pbmod
 from triage.agents import TriageFn
 from triage.config import PLAYBOOK_DIR, REPORTS_DIR, RUNS_DIR, WORKERS
+from triage.dashboard import build_dashboard
 from triage.dataset import Claim
 from triage.evaluate import evaluate, write_results_csv
 from triage.llm import USAGE
@@ -116,10 +117,13 @@ def _run(claims, triage_fn, propose_fn, threshold, workers, runs_dir, playbook_d
         edits = propose_fn(base_fails, base, state["edit_history"])
         log.info("supervisor replied with %d edit(s) in %.0fs", len(edits), time.perf_counter() - t0)
         descriptions = [c.description for c in claims]
+        tried = _rolled_back_edits(state["edit_history"])
         candidate = base
         next_version = pbmod.latest_version(playbook_dir) + 1
         for edit in edits:
             issues = guardrails.lint_rule(edit.text, descriptions)
+            if _norm_edit(edit.describe()) in tried:
+                issues.append(f"already tried in run {tried[_norm_edit(edit.describe())]} and rolled back")
             if not issues:
                 try:
                     candidate = apply_edit(candidate, edit, next_version)
@@ -172,6 +176,15 @@ def _run(claims, triage_fn, propose_fn, threshold, workers, runs_dir, playbook_d
     banner(log, f"RUN {run_no} DONE  |  {status}  |  avg {score:.3f}  |  {time.perf_counter() - started:.0f}s  |  "
                 f"{usage['calls']} Crusoe calls, {usage['input_tokens']:,} in / {usage['output_tokens']:,} out tokens")
     return row
+
+
+def _norm_edit(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
+def _rolled_back_edits(edit_history: list[dict]) -> dict[str, int]:
+    """Normalized edit text -> run that rolled it back. Re-proposing these verbatim is never allowed."""
+    return {_norm_edit(e["edit"]): h["run"] for h in edit_history if h["result"] == "rolled back" for e in h["edits"]}
 
 
 def _log_scorecard(report, summary: dict, runs_dir: Path, best: dict | None) -> None:
@@ -247,4 +260,5 @@ def history_report(runs_dir: Path = RUNS_DIR, out: Path = REPORTS_DIR / "history
     text = "\n".join(lines) + "\n"
     out.parent.mkdir(exist_ok=True)
     out.write_text(text)
+    build_dashboard(runs_dir, out.parent / "dashboard.html")
     return text

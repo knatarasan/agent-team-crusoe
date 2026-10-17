@@ -80,8 +80,13 @@ def make_propose_fn(llm, k: int = 3) -> ProposeFn:
             "rules": [r.model_dump(include={"id", "text", "role", "state"}) for r in playbook.active()],
             "role_instructions": playbook.role_instructions,
         }
+        rolled_back = [e["edit"] for h in history if h["result"] == "rolled back" for e in h["edits"]]
+        blocked = ("Edits already tried and ROLLED BACK. Do not propose these again. A batch rolls back as a whole, "
+                   "so one of them may have been fine: you may propose a narrower or state-scoped rewrite of one, "
+                   "on its own, but never the same text:\n" + "\n".join(f"- {e}" for e in rolled_back) + "\n\n"
+                   ) if rolled_back else ""
         user = (f"Current config (v{playbook.version}):\n{json.dumps(config, indent=1)}\n\n"
-                f"Edit history (oldest first):\n{json.dumps(history[-10:], indent=1)}\n\n"
+                f"Edit history (oldest first):\n{json.dumps(history[-10:], indent=1)}\n\n{blocked}"
                 f"Mistakes in the latest run ({len(fails)} claims, worst first):\n"
                 f"{json.dumps(fails[:MAX_FAILURES_SHOWN], indent=1)}")
         out = invoke_json(llm, system, user, tag="supervisor")

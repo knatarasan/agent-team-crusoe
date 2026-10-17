@@ -1,0 +1,88 @@
+version: 3
+rules:
+- id: R1
+  text: When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport),
+    never deny or fast-track. Route to coverage review with human sign-off.
+  role: coverage
+  state: all
+  source_claim_ids:
+  - '27'
+  - '28'
+  - '29'
+  added_in: 1
+  status: active
+  score_delta: null
+- id: R2
+  text: When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny
+    or pay. Route to coverage review with human sign-off.
+  role: coverage
+  state: all
+  source_claim_ids:
+  - '37'
+  - '25'
+  added_in: 1
+  status: active
+  score_delta: null
+- id: R3
+  text: When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human
+    sign-off before any payment decision.
+  role: coverage
+  state: all
+  source_claim_ids:
+  - '42'
+  - '41'
+  added_in: 1
+  status: active
+  score_delta: null
+- id: R4
+  text: When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must
+    be included in the subrogation demand and refunded to the insured from the recovery.
+  role: decider
+  state: all
+  source_claim_ids:
+  - '4'
+  - '17'
+  - '21'
+  - '49'
+  - '18'
+  - '19'
+  added_in: 3
+  status: active
+  score_delta: null
+- id: R5
+  text: When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the
+    insured is not at fault.
+  role: decider
+  state: all
+  source_claim_ids:
+  - '6'
+  - '16'
+  added_in: 3
+  status: active
+  score_delta: null
+- id: R6
+  text: When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple
+    occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede
+    100% fault without SIU review.
+  role: fraud
+  state: all
+  source_claim_ids:
+  - '32'
+  - '3'
+  added_in: 3
+  status: active
+  score_delta: null
+role_instructions: {}
+changelog:
+- 'v0: day-1 team. Base prompts only, no house rules.'
+- 'v1: proposed after run 1 on top of v0: add [coverage/all] When a claim involves possible business use of a personal auto
+  policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off.
+  | add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature,
+  do not deny or pay. Route to coverage review with human sign-off. | add [coverage/all] When a claim is reported more than
+  30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.'
+- 'v3: proposed after run 3 on top of v1: add [decider/all] When a claim is not at fault and subrogation is pursued, do not
+  apply the insured''s deductible. The deductible must be included in the subrogation demand and refunded to the insured from
+  the recovery. | add [decider/all] When a claim involves no injuries and clear liability, route to fast-track. Do not route
+  to subrogation unless the insured is not at fault. | add [fraud/all] When a claim involves a rear-end collision where the
+  lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same
+  clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review.'

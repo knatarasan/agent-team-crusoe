@@ -182,3 +182,20 @@ def test_runs_improve_keep_best_and_roll_back(tmp_path):
     assert "names a specific claim" in (runs_dir / "run_001" / "changes.md").read_text()
     report = history_report(runs_dir, tmp_path / "history.md")
     assert "xychart-beta" in report and "rolled back" in report
+    html = (tmp_path / "dashboard.html").read_text()
+    assert "Claim grid" in html and "Next run will test" in html and html.count("<svg") == 1
+
+
+def test_rolled_back_edits_cannot_be_reproposed(tmp_path):
+    from triage import playbook as pbmod
+    from triage.runs import load_state, run_once
+
+    pb_dir, runs_dir = tmp_path / "playbook", tmp_path / "runs"
+    pbmod.save(Playbook(), pb_dir)
+    bad = Edit(op="instruct", role="coverage", text="When unsure, deny everything to be safe")
+    kw = dict(threshold=0.02, workers=2, runs_dir=runs_dir, playbook_dir=pb_dir)
+    run_once(_claims(), _team, lambda f, p, h: [bad], **kw)   # run 1 proposes the overreach
+    run_once(_claims(), _team, lambda f, p, h: [bad], **kw)   # run 2 rolls it back; supervisor repeats it
+    state = load_state(runs_dir)
+    assert state["pending_edits"] == [] and state["next_version"] == 0  # blocked, so run 3 re-runs the best config
+    assert "already tried in run 2 and rolled back" in (runs_dir / "run_002" / "changes.md").read_text()

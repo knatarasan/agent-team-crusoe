@@ -67,13 +67,14 @@ def cmd_run(args):
     for _ in range(args.times):
         run_once(claims, triage_fn, propose_fn, threshold=args.threshold, workers=args.workers)
     history_report()
-    log.info("history: %s | chart: %s", RUNS_DIR / "history.csv", REPORTS_DIR / "history.md")
+    log.info("history: %s | dashboard: %s", RUNS_DIR / "history.csv", REPORTS_DIR / "dashboard.html")
 
 
 def cmd_history(args):
     from triage.runs import history_report
 
     print(history_report())
+    print(f"Dashboard: {REPORTS_DIR / 'dashboard.html'}  (open it in a browser)")
 
 
 def cmd_eval(args):
