@@ -20,6 +20,14 @@ uv run triage compare --before 0 --split test   # before/after table -> reports/
 uv run pytest                               # offline tests (no Crusoe calls)
 ```
 
+For a complete experiment using **all 50 current rows for training** and separate validation/test files:
+
+```bash
+uv run triage --workers 8 experiment --validation data/validation.jsonl --hidden-test data/hidden_test.jsonl --start 0 --cycles 3 --k 3
+```
+
+This evaluates all training rows before learning, proposes and validates edits, saves the best qualifying playbook per cycle, and compares the original and final versions on all training rows and a separate hidden test. Results are saved in a unique `reports/experiment_*/summary.md` folder with matching CSVs under `runs/experiment_*/`. The separate benchmark fixtures are synthetic; see `data/benchmark_notes.md` for conventions and limits. The original `improve` command still uses a split of `dataset.csv`.
+
 With fewer than 30 rows in `data/dataset.csv`, train, validation and test are the same claims (smoke mode). The pipeline runs, but the before-and-after result isn't a held-out result until the dataset grows.
 
 ## Layout

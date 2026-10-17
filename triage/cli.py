@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from pathlib import Path
 
 from triage import playbook as pbmod
 from triage.config import REPORTS_DIR, WORKERS
@@ -113,6 +114,36 @@ def cmd_compare(args):
     print("\n".join(lines) + f"\n\nWritten to {out}")
 
 
+def cmd_experiment(args):
+    import hashlib
+    from uuid import uuid4
+
+    from triage.agents import make_triage_fn
+    from triage.config import DATA_CSV, GOLD_CACHE, RUNS_DIR
+    from triage.dataset import load_labeled_claims
+    from triage.experiment import run_experiment
+    from triage.llm import base_url, chat_model, model_name
+    from triage.supervisor import make_propose_fn
+
+    run_name = f"experiment_{uuid4().hex[:8]}"
+    paths = {"train": DATA_CSV, "train_gold": GOLD_CACHE,
+             "validation": args.validation, "hidden_test": args.hidden_test}
+    configuration = {
+        "worker_model": model_name("worker"), "optimizer_model": model_name("optimizer"),
+        "endpoint": base_url(), "candidate_edits_per_cycle": args.k,
+        "datasets": {name: {"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                     for name, path in paths.items()},
+    }
+    result = run_experiment(
+        attach_gold(load_claims()), load_labeled_claims(args.validation), load_labeled_claims(args.hidden_test),
+        pbmod.load(args.start), make_triage_fn(chat_model("worker")),
+        make_propose_fn(chat_model("optimizer", temperature=0.3), args.k),
+        report_dir=REPORTS_DIR / run_name, runs_dir=RUNS_DIR / run_name,
+        cycles=args.cycles, threshold=args.threshold, workers=args.workers, configuration=configuration,
+        resume_baseline=args.resume_baseline)
+    print(json.dumps({"final_version": result["final_version"], "comparisons": result["comparisons"]}, indent=2))
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="triage", description=__doc__)
     p.add_argument("--workers", type=int, default=WORKERS, help="parallel claims")
@@ -142,6 +173,16 @@ def main(argv=None):
     c.add_argument("--after", type=int, help="default: latest")
     c.add_argument("--split", choices=["train", "val", "test", "all"], default="test")
     c.set_defaults(fn=cmd_compare)
+
+    x = sub.add_parser("experiment", help="baseline all training rows, improve on separate validation, then test")
+    x.add_argument("--validation", type=Path, required=True, help="separate labeled JSONL validation file")
+    x.add_argument("--hidden-test", type=Path, required=True, help="separate labeled JSONL hidden test file")
+    x.add_argument("--start", type=int, default=0)
+    x.add_argument("--cycles", type=int, default=3)
+    x.add_argument("--k", type=int, default=3)
+    x.add_argument("--threshold", type=float, default=0.01)
+    x.add_argument("--resume-baseline", type=Path, help="reuse successful baseline decisions from a previous experiment")
+    x.set_defaults(fn=cmd_experiment)
 
     args = p.parse_args(argv)
     args.fn(args)

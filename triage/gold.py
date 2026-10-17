@@ -2,6 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
+from triage import guardrails
 from triage.dataset import Claim, load_gold_cache, save_gold_cache
 from triage.llm import invoke_json
 from triage.schemas import GoldDecision
@@ -19,7 +20,7 @@ Return exactly this JSON object:
   "route": "fast_track" | "adjuster" | "siu" | "subrogation" | "coverage_review" | "deny",
   "siu_referral": true if referred to the special investigations unit,
   "subrogation": true if we recover from the other carrier,
-  "human_signoff": true if a human must sign off (always true for denials, coverage review, injury or SIU),
+  "human_signoff": true if a human must sign off (always true for denials, coverage review, adjuster, injury or SIU),
   "injury": true if anyone reported an injury,
   "rationale": one sentence
 }
@@ -28,7 +29,8 @@ Route precedence: deny > coverage_review > siu > adjuster > subrogation > fast_t
 
 def extract_gold(claim: Claim, llm) -> GoldDecision:
     user = f"State: {claim.state}\nClaim description: {claim.description}\n\nAdjuster's final decision: {claim.gold_text}"
-    return GoldDecision.model_validate(invoke_json(llm, SYSTEM, user))
+    gold = GoldDecision.model_validate(invoke_json(llm, SYSTEM, user))
+    return GoldDecision.model_validate(guardrails.enforce(gold, gold.injury).model_dump())
 
 
 def prepare_gold(claims: list[Claim], llm, workers: int = 8, force: bool = False) -> tuple[int, int]:

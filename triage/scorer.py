@@ -8,8 +8,10 @@ from triage.schemas import GoldDecision, TriageDecision
 WEIGHTS = {
     "wrongful_denial": 10,
     "wrongful_payment": 5,
+    "missed_payment": 5,
     "missed_fraud": 5,
     "injury_fast_tracked": 3,
+    "missing_human_signoff": 3,
     "missed_subrogation": 2,
     "fault_off": 1,
     "deductible_wrong": 1,
@@ -18,6 +20,7 @@ WEIGHTS = {
 }
 MAX_PENALTY = 20
 FAULT_TOLERANCE = 10
+DECISION_FIELDS = set(TriageDecision.model_fields) - {"rationale", "rules_cited"}
 
 
 @dataclass
@@ -48,9 +51,13 @@ def score_claim(claim_id: str, pred: TriageDecision, gold: GoldDecision) -> Clai
         m.append("injury_fast_tracked")
     if gold.subrogation and not pred.subrogation:
         m.append("missed_subrogation")
+    if gold.human_signoff and not pred.human_signoff:
+        m.append("missing_human_signoff")
 
     # Finer checks only matter when both agree the claim is covered.
     if gold.coverage == "covered" and pred.coverage == "covered":
+        if (gold.pay_other_party and not pred.pay_other_party) or (gold.pay_own_vehicle and not pred.pay_own_vehicle):
+            m.append("missed_payment")
         if gold.fault_pct is not None and (pred.fault_pct is None or abs(pred.fault_pct - gold.fault_pct) > FAULT_TOLERANCE):
             m.append("fault_off")
         if pred.deductible_applies != gold.deductible_applies:
@@ -98,7 +105,11 @@ class Report:
         return {
             "claims": n,
             "cost_weighted_score": round(self.cost_weighted_score, 3),
-            "exact_match": _ratio(sum(not s.mistakes for s in self.scores), n),
+            "exact_match": _ratio(sum(
+                not s.mistakes and s.claim_id in p and s.claim_id in g
+                and all(getattr(p[s.claim_id], name) == getattr(g[s.claim_id], name) for name in DECISION_FIELDS)
+                for s in self.scores
+            ), n),
             "wrongful_denials": self.wrongful_denials,
             "straight_through_rate": _ratio(straight_through, len(p)),
             "siu_hit_rate": _ratio(sum(g[c].siu_referral for c in siu_pred if c in g), len(siu_pred)),

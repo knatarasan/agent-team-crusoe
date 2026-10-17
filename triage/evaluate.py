@@ -12,7 +12,7 @@ from triage.dataset import Claim
 from triage.llm import USAGE
 from triage.playbook import Playbook
 from triage.schemas import TriageDecision
-from triage.scorer import Report, score_claim
+from triage.scorer import MAX_PENALTY, Report, score_claim
 
 ERROR_DECISION = TriageDecision(coverage="coverage_review", route="coverage_review", human_signoff=True,
                                 rationale="agent error")
@@ -32,16 +32,21 @@ def evaluate(claims: list[Claim], playbook: Playbook, triage_fn: TriageFn, worke
     with ThreadPoolExecutor(max(1, workers)) as pool:
         preds = dict(zip((c.id for c in claims), pool.map(run, claims)))
     scores = [score_claim(c.id, preds[c.id], c.gold) for c in claims]
+    for score in scores:
+        if score.claim_id in errors:
+            score.mistakes.append("agent_error")
+            score.penalty = max(score.penalty, MAX_PENALTY)
     return Report(scores, preds, {c.id: c.gold for c in claims}, len(errors))
 
 
-def write_outputs(claims: list[Claim], report: Report, playbook: Playbook, split: str) -> tuple[Path, Path]:
-    RUNS_DIR.mkdir(exist_ok=True)
-    REPORTS_DIR.mkdir(exist_ok=True)
+def write_outputs(claims: list[Claim], report: Report, playbook: Playbook, split: str, *,
+                  runs_dir: Path = RUNS_DIR, reports_dir: Path = REPORTS_DIR) -> tuple[Path, Path]:
+    runs_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir.mkdir(parents=True, exist_ok=True)
     scores = {s.claim_id: s for s in report.scores}
 
-    csv_path = RUNS_DIR / f"dataset_scored_v{playbook.version}_{split}.csv"
-    with csv_path.open("w", newline="") as f:
+    csv_path = runs_dir / f"dataset_scored_v{playbook.version}_{split}.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["s.no", "state", "description", "expected_outcome_gold", "agent_outcome", "evaluation", "mistakes"])
         for c in claims:
@@ -49,7 +54,7 @@ def write_outputs(claims: list[Claim], report: Report, playbook: Playbook, split
             w.writerow([c.id, c.state, c.description, c.gold_text, f"{d.brief()}. {d.rationale}",
                         f"{s.score:.0%}", ";".join(s.mistakes)])
 
-    json_path = REPORTS_DIR / f"v{playbook.version}_{split}.json"
+    json_path = reports_dir / f"v{playbook.version}_{split}.json"
     json_path.write_text(json.dumps({
         "playbook_version": playbook.version,
         "split": split,
@@ -57,5 +62,5 @@ def write_outputs(claims: list[Claim], report: Report, playbook: Playbook, split
         "usage": USAGE.snapshot(),
         "claims": [{"claim_id": s.claim_id, "score": s.score, "mistakes": s.mistakes,
                     "decision": report.preds[s.claim_id].model_dump()} for s in report.scores],
-    }, indent=2))
+    }, indent=2), encoding="utf-8")
     return csv_path, json_path

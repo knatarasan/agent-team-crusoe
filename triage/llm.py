@@ -3,7 +3,9 @@
 import json
 import os
 import re
+import sys
 import threading
+import time
 from typing import Literal
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -86,10 +88,23 @@ def _content(msg) -> str:
     return c
 
 
+def _invoke_with_rate_limit_backoff(llm, msgs, retries: int = 3):
+    for attempt in range(retries + 1):
+        try:
+            return llm.invoke(msgs)
+        except Exception as exc:
+            rate_limited = getattr(exc, "status_code", None) == 429 or type(exc).__name__.endswith("RateLimitError")
+            if not rate_limited or attempt == retries:
+                raise
+            delay = 15 * (attempt + 1)
+            print(f"[rate-limit] waiting {delay}s before retry {attempt + 1}/{retries}", file=sys.stderr)
+            time.sleep(delay)
+
+
 def invoke_json(llm, system: str, user: str, retries: int = 1):
     msgs = [SystemMessage(system), HumanMessage(user)]
     for attempt in range(retries + 1):
-        resp = llm.invoke(msgs)
+        resp = _invoke_with_rate_limit_backoff(llm, msgs)
         USAGE.add(getattr(resp, "usage_metadata", None))
         text = _content(resp)
         try:

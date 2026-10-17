@@ -16,9 +16,10 @@ def enforce(decision: TriageDecision, injury: bool) -> TriageDecision:
     d = decision.model_copy()
     if d.coverage != "covered" or d.route in ("deny", "coverage_review", "siu", "adjuster"):
         d.human_signoff = True  # the agent recommends; a human signs off every denial and escalation
-    if injury and d.route == "fast_track":
-        d.route = "adjuster"  # injury claims always reach a human
+    if injury:
         d.human_signoff = True
+        if d.route == "fast_track":
+            d.route = "adjuster"  # injury claims always reach a human
     return d
 
 

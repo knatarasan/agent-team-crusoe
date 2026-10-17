@@ -1,0 +1,20 @@
+{
+  "same_playbook": 0,
+  "overlapping_claims": 26,
+  "first_v0_cost_weighted_score": 0.8346153846153845,
+  "second_v0_cost_weighted_score": 0.8192307692307692,
+  "score_difference_percentage_points": -1.538461538461533,
+  "decisions_with_changed_fields": 8,
+  "changed_claim_ids": [
+    "6",
+    "7",
+    "9",
+    "10",
+    "29",
+    "30",
+    "34",
+    "50"
+  ],
+  "same_dataset_gold_and_weights": true,
+  "note": "Observational repeatability check using two existing v0 executions. Concurrency and call timing differed; this is not a controlled multi-seed study. No extra model calls were made."
+}

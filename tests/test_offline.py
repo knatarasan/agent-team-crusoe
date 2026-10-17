@@ -8,7 +8,7 @@ from triage.llm import parse_json
 from triage.loop import improve
 from triage.playbook import Playbook, Rule
 from triage.schemas import GoldDecision, TriageDecision
-from triage.scorer import score_claim
+from triage.scorer import Report, score_claim
 from triage.supervisor import Edit, apply_edit
 
 BASELINE = GoldDecision(coverage="covered", fault_pct=100, pay_other_party=True, pay_own_vehicle=True,
@@ -54,12 +54,69 @@ def test_over_escalation_is_cheap():
     assert s.mistakes == ["over_escalated"] and s.score == pytest.approx(0.95)
 
 
+@pytest.mark.parametrize("field", ["pay_other_party", "pay_own_vehicle"])
+def test_missing_required_payment_is_penalized(field):
+    pred = NAIVE.model_copy(update={field: False})
+    score = score_claim("1", pred, BASELINE)
+    assert "missed_payment" in score.mistakes and score.score < 1.0
+
+
+def test_missing_required_human_signoff_is_penalized():
+    pred = TriageDecision.model_validate(EXCLUDED.model_dump()).model_copy(update={"human_signoff": False})
+    score = score_claim("2", pred, EXCLUDED)
+    assert "missing_human_signoff" in score.mistakes and score.score < 1.0
+
+
+def test_exact_match_is_stricter_than_fault_scoring_tolerance():
+    pred = NAIVE.model_copy(update={"fault_pct": 95})
+    score = score_claim("1", pred, BASELINE)
+    report = Report([score], {"1": pred}, {"1": BASELINE})
+    assert score.score == 1.0
+    assert report.summary()["exact_match"] == 0.0
+    report.preds["1"] = NAIVE.model_copy(update={"rationale": "different explanation", "rules_cited": ["R1"]})
+    assert report.summary()["exact_match"] == 1.0
+
+
+def test_agent_error_cannot_receive_full_credit_for_review_fallback():
+    from triage.evaluate import evaluate
+
+    gold = GoldDecision(coverage="coverage_review", route="coverage_review", human_signoff=True)
+    claim = Claim("error", "CA", "policy status unknown", "review", gold)
+
+    def broken_team(claim, playbook):
+        raise ValueError("invalid model output")
+
+    report = evaluate([claim], Playbook(), broken_team, workers=1)
+    assert report.errors == 1
+    assert report.cost_weighted_score == 0.0
+    assert report.summary()["exact_match"] == 0.0
+    assert "agent_error" in report.scores[0].mistakes
+
+
 def test_guardrails():
     assert guardrails.enforce(TriageDecision(coverage="denied", route="deny"), injury=False).human_signoff
     fixed = guardrails.enforce(NAIVE, injury=True)
     assert fixed.route == "adjuster" and fixed.human_signoff
     assert guardrails.lint_rule("Refer claims from ZIP code 77001 to SIU")
     assert not guardrails.lint_rule("Deny when the driver is a signed excluded driver")
+
+
+def test_injury_requires_human_signoff_on_subrogation_route():
+    decision = TriageDecision.model_validate(HIT.model_dump())
+    fixed = guardrails.enforce(decision, injury=True)
+    assert fixed.route == "subrogation" and fixed.human_signoff
+    assert not decision.human_signoff
+
+
+@pytest.mark.parametrize("route,injury", [("adjuster", False), ("fast_track", True)])
+def test_gold_extraction_applies_shared_safety_rules(monkeypatch, route, injury):
+    from triage import gold as goldmod
+
+    raw = BASELINE.model_copy(update={"route": route, "injury": injury}).model_dump()
+    monkeypatch.setattr(goldmod, "invoke_json", lambda *args: raw)
+    result = goldmod.extract_gold(Claim("1", "CA", "claim", "adjuster decision"), object())
+    assert result.route == "adjuster" and result.human_signoff
+    assert result.injury == injury
 
 
 def test_playbook_filtering_and_edits():

@@ -1,0 +1,255 @@
+{
+  "final_version": 1,
+  "val_history": [
+    0.7937500000000001,
+    0.8770833333333333
+  ],
+  "decisions": [
+    {
+      "cycle": 1,
+      "edit": "add [coverage/all] If the vehicle was being used for paid delivery, rideshare, or any other commercial purpose without an applicable endorsement, do not deny the claim. Route to coverage review with human sign-off because business-use exclusions vary by policy and state law.",
+      "accepted": false,
+      "reason": "validation gain +0.079",
+      "val_score": 0.8729166666666667,
+      "gain": 0.07916666666666661,
+      "eligible": true,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "If the vehicle was being used for paid delivery, rideshare, or any other commercial purpose without an applicable endorsement, do not deny the claim. Route to coverage review with human sign-off because business-use exclusions vary by policy and state law.",
+        "role": "coverage",
+        "state": "all",
+        "rationale": "Claims 27, 28, and 29 were wrongfully denied because the team treated business-use exclusions as automatic. These exclusions require careful policy interpretation and often have exceptions, so they must be escalated to human coverage review rather than denied outright.",
+        "source_claim_ids": [
+          "27",
+          "28",
+          "29"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.873,
+        "exact_match": 0.375,
+        "wrongful_denials": 1,
+        "straight_through_rate": 0.208,
+        "siu_hit_rate": 0.75,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.925,
+          "coverage_review": 0.762,
+          "deny": 1.0,
+          "fast_track": 1.0,
+          "siu": 0.6,
+          "subrogation": 0.95
+        },
+        "errors": 0
+      }
+    },
+    {
+      "cycle": 1,
+      "edit": "add [coverage/all] If a claim is reported more than 30 days after the loss, or if there is any question about policy validity (late notice, cancellation, excluded driver, unsigned forms), do not deny or pay. Route to coverage review with human sign-off.",
+      "accepted": false,
+      "reason": "validation gain +0.062",
+      "val_score": 0.8562500000000001,
+      "gain": 0.0625,
+      "eligible": true,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "If a claim is reported more than 30 days after the loss, or if there is any question about policy validity (late notice, cancellation, excluded driver, unsigned forms), do not deny or pay. Route to coverage review with human sign-off.",
+        "role": "coverage",
+        "state": "all",
+        "rationale": "Claims 42, 25, and 37 show the team either denied or paid claims with unresolved coverage questions (late notice, unsigned exclusion, unproven cancellation). These require human review to determine whether coverage applies before any payment or denial decision.",
+        "source_claim_ids": [
+          "42",
+          "25",
+          "37"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.856,
+        "exact_match": 0.167,
+        "wrongful_denials": 4,
+        "straight_through_rate": 0.292,
+        "siu_hit_rate": 0.75,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.875,
+          "coverage_review": 0.75,
+          "deny": 0.988,
+          "fast_track": 1.0,
+          "siu": 0.6,
+          "subrogation": 0.925
+        },
+        "errors": 0
+      }
+    },
+    {
+      "cycle": 1,
+      "edit": "add [decider/all] If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed liability, do not fast-track. Route to an adjuster with human sign-off.",
+      "accepted": true,
+      "reason": "validation gain +0.083",
+      "val_score": 0.8770833333333333,
+      "gain": 0.08333333333333326,
+      "eligible": true,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed liability, do not fast-track. Route to an adjuster with human sign-off.",
+        "role": "decider",
+        "state": "all",
+        "rationale": "Claims 46, 43, 44, 47, and 48 were incorrectly fast-tracked or routed without human sign-off despite injuries, large estimates, or disputed liability. These require adjuster review to ensure proper payment and fault determination.",
+        "source_claim_ids": [
+          "46",
+          "43",
+          "44",
+          "47",
+          "48"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.877,
+        "exact_match": 0.375,
+        "wrongful_denials": 3,
+        "straight_through_rate": 0.208,
+        "siu_hit_rate": 0.75,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.938,
+          "coverage_review": 0.675,
+          "deny": 1.0,
+          "fast_track": 0.988,
+          "siu": 0.787,
+          "subrogation": 0.875
+        },
+        "errors": 0
+      }
+    },
+    {
+      "cycle": 2,
+      "edit": "add [decider/all] Do not deny a claim solely because the insured was using the vehicle for delivery, rideshare, or other business purposes, or because the claim was reported late, or because a policy was cancelled for non-payment. These are coverage questions that require routing to coverage review with human sign-off.",
+      "accepted": false,
+      "reason": "validation gain -0.015 below threshold 0.01",
+      "val_score": 0.8624999999999999,
+      "gain": -0.014583333333333393,
+      "eligible": false,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "Do not deny a claim solely because the insured was using the vehicle for delivery, rideshare, or other business purposes, or because the claim was reported late, or because a policy was cancelled for non-payment. These are coverage questions that require routing to coverage review with human sign-off.",
+        "role": "decider",
+        "state": "all",
+        "rationale": "Multiple claims (27, 28, 29, 37, 42) were wrongfully denied by the team for coverage issues that the senior adjuster determined required human review. The team incorrectly applied exclusions and notice requirements as automatic denials.",
+        "source_claim_ids": [
+          "27",
+          "28",
+          "29",
+          "37",
+          "42"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.862,
+        "exact_match": 0.208,
+        "wrongful_denials": 2,
+        "straight_through_rate": 0.25,
+        "siu_hit_rate": 0.5,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.875,
+          "coverage_review": 0.825,
+          "deny": 0.988,
+          "fast_track": 1.0,
+          "siu": 0.537,
+          "subrogation": 0.95
+        },
+        "errors": 0
+      }
+    },
+    {
+      "cycle": 2,
+      "edit": "add [decider/all] When our insured rear-ends another vehicle, pay the other party's property damage under liability coverage and the insured's vehicle under collision coverage (minus deductible) unless a coverage exclusion is confirmed by coverage review. Do not route to subrogation when our insured is at fault.",
+      "accepted": false,
+      "reason": "wrongful denials 3 -> 4",
+      "val_score": 0.84375,
+      "gain": -0.033333333333333326,
+      "eligible": false,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "When our insured rear-ends another vehicle, pay the other party's property damage under liability coverage and the insured's vehicle under collision coverage (minus deductible) unless a coverage exclusion is confirmed by coverage review. Do not route to subrogation when our insured is at fault.",
+        "role": "decider",
+        "state": "all",
+        "rationale": "Many claims (1, 6, 7, 8, 9, 12, 30) missed paying the other party's property damage under liability coverage. The team incorrectly believed liability coverage was absent or that subrogation was appropriate when the insured was at fault.",
+        "source_claim_ids": [
+          "1",
+          "6",
+          "7",
+          "8",
+          "9",
+          "12",
+          "30"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.844,
+        "exact_match": 0.292,
+        "wrongful_denials": 4,
+        "straight_through_rate": 0.292,
+        "siu_hit_rate": 0.5,
+        "subrogation_caught": 0.8,
+        "by_category": {
+          "adjuster": 0.963,
+          "coverage_review": 0.512,
+          "deny": 1.0,
+          "fast_track": 1.0,
+          "siu": 0.725,
+          "subrogation": 0.863
+        },
+        "errors": 0
+      }
+    },
+    {
+      "cycle": 2,
+      "edit": "add [decider/all] If a claim involves a rear-end collision where the lead vehicle reversed, or any other disputed liability scenario, do not fast-track or auto-assign fault. Route to an adjuster with human sign-off and consider comparative fault.",
+      "accepted": false,
+      "reason": "wrongful denials 3 -> 4",
+      "val_score": 0.8375,
+      "gain": -0.039583333333333304,
+      "eligible": false,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "If a claim involves a rear-end collision where the lead vehicle reversed, or any other disputed liability scenario, do not fast-track or auto-assign fault. Route to an adjuster with human sign-off and consider comparative fault.",
+        "role": "decider",
+        "state": "all",
+        "rationale": "Claim 47 involved a lead vehicle reversing into the insured, which the team incorrectly treated as a straightforward rear-end with 0% fault for the insured. The senior adjuster determined comparative fault applied and required human sign-off.",
+        "source_claim_ids": [
+          "47"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.838,
+        "exact_match": 0.417,
+        "wrongful_denials": 4,
+        "straight_through_rate": 0.208,
+        "siu_hit_rate": 0.75,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.925,
+          "coverage_review": 0.575,
+          "deny": 1.0,
+          "fast_track": 1.0,
+          "siu": 0.588,
+          "subrogation": 0.938
+        },
+        "errors": 0
+      }
+    }
+  ]
+}

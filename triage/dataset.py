@@ -29,13 +29,20 @@ class Claim:
 
 
 def load_claims(path: Path = DATA_CSV) -> list[Claim]:
-    with path.open(newline="") as f:
+    with path.open(newline="", encoding="utf-8") as f:
         return [
             Claim(id=row["s.no"].strip(), state=row["state"].strip().upper(), description=row["description"].strip(),
                   gold_text=row["expected_outcome_gold"].strip())
             for row in csv.DictReader(f)
             if row.get("s.no", "").strip()
         ]
+
+
+def load_labeled_claims(path: Path) -> list[Claim]:
+    """Load a separate, explicitly labeled JSONL benchmark without model-based extraction."""
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [Claim(str(row["id"]), row["state"].upper(), row["description"], row["gold_text"],
+                  GoldDecision.model_validate(row["gold"])) for row in rows]
 
 
 def load_gold_cache(path: Path = GOLD_CACHE) -> dict[str, dict]:

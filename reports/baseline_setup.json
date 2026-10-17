@@ -1,0 +1,98 @@
+{
+  "dataset_sha256": "62b1ca01c0c362dc26de3b0d5e32dd90798de2d61fbc34c3c432502ee330021a",
+  "gold_sha256": "79b196df77c387fcc6137c56d59302a8f5941b76deffefadce68b8b6082bb9a4",
+  "seed": 42,
+  "playbook_version": 0,
+  "endpoint": "https://api.inference.crusoecloud.com/v1",
+  "worker_model": "openai/gpt-oss-120b",
+  "optimizer_model": "deepseek-ai/DeepSeek-V4-Pro",
+  "split_claim_ids": {
+    "train": [
+      "46",
+      "44",
+      "45",
+      "37",
+      "29",
+      "28",
+      "25",
+      "5",
+      "23",
+      "35",
+      "14",
+      "30",
+      "10",
+      "6",
+      "38",
+      "7",
+      "9",
+      "40",
+      "31",
+      "50",
+      "34",
+      "3",
+      "21",
+      "49",
+      "17",
+      "20"
+    ],
+    "val": [
+      "47",
+      "43",
+      "41",
+      "42",
+      "2",
+      "24",
+      "36",
+      "15",
+      "16",
+      "8",
+      "13",
+      "32",
+      "4",
+      "18"
+    ],
+    "test": [
+      "48",
+      "27",
+      "26",
+      "1",
+      "39",
+      "12",
+      "11",
+      "33",
+      "22",
+      "19"
+    ]
+  },
+  "evaluated_split": "train",
+  "gold_generation_usage": {
+    "calls": 50,
+    "input_tokens": 20426,
+    "output_tokens": 6586
+  },
+  "gold_guardrail_corrections": [
+    "43",
+    "44",
+    "47",
+    "48"
+  ],
+  "gold_status": "LLM-extracted from supplied expected outcomes; safety consistency checked; not expert-reviewed",
+  "label_review_notes": [
+    "Claim 3 does not specify an exact fault percentage; structured gold leaves fault_pct null.",
+    "Claim 5 gives a conditional denial requiring notice confirmation, but the claim input does not establish notice. Its extracted denial label requires review."
+  ],
+  "score_weights": {
+    "wrongful_denial": 10,
+    "wrongful_payment": 5,
+    "missed_payment": 5,
+    "missed_fraud": 5,
+    "injury_fast_tracked": 3,
+    "missing_human_signoff": 3,
+    "missed_subrogation": 2,
+    "fault_off": 1,
+    "deductible_wrong": 1,
+    "over_escalated": 1,
+    "wrong_route": 1
+  },
+  "tests_passed": 19
+}

@@ -1,0 +1,7 @@
+﻿{
+    "reason":  "User requested stopping after the current cycle",
+    "completed_cycle":  2,
+    "final_version":  1,
+    "evaluated_candidates":  6,
+    "final_training_and_hidden_test_comparisons_run":  false
+}

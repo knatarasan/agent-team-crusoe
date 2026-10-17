@@ -1,0 +1,710 @@
+{
+  "playbook_version": 0,
+  "split": "validation",
+  "summary": {
+    "claims": 24,
+    "cost_weighted_score": 0.756,
+    "exact_match": 0.25,
+    "wrongful_denials": 6,
+    "straight_through_rate": 0.292,
+    "siu_hit_rate": 1.0,
+    "subrogation_caught": 0.8,
+    "by_category": {
+      "adjuster": 0.825,
+      "coverage_review": 0.512,
+      "deny": 1.0,
+      "fast_track": 1.0,
+      "siu": 0.487,
+      "subrogation": 0.712
+    },
+    "errors": 1
+  },
+  "usage": {
+    "calls": 302,
+    "input_tokens": 160959,
+    "output_tokens": 136292
+  },
+  "claims": [
+    {
+      "claim_id": "V001",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "The insured was 100% at fault for nudging a stationary maintenance van at walking speed. Policy includes property\u2011damage liability (covers the other vehicle) and collision coverage (covers the insured's vehicle) subject to the $750 deductible. Damage is minor, no injuries, and there are no fraud indicators, making this a straightforward claim suitable for fast\u2011track payment.",
+        "rules_cited": [
+          "California Civil Code \u00a71714 \u2013 Everyone is responsible for injuries caused by their own negligence (applies to fault determination).",
+          "California Civil Code \u00a71714 \u2013 Everyone is responsible for injuries caused by their own negligence.",
+          "California Vehicle Code \u00a7 16020 \u2013 Duty to keep proper distance, confirming insured fault but not indicative of fraud.",
+          "California Vehicle Code \u00a716020 \u2013 Duty to keep a proper distance and avoid collision with stationary vehicles.",
+          "California law requires minimum liability coverage for property damage caused by the insured.",
+          "Collision coverage pays for damage to the insured's vehicle resulting from a collision with another vehicle or object, regardless of fault, subject to the deductible.",
+          "Collision coverage pays for damage to the insured's vehicle resulting from a collision with another vehicle or object, subject to the deductible.",
+          "Internal fraud screening guideline: No red\u2011flag indicators (low severity, no injury, consistent narrative).",
+          "Liability coverage provides protection for bodily injury and property damage caused by the insured while operating the vehicle (per standard auto policy forms).",
+          "Liability coverage provides protection for property damage caused by the insured while operating the vehicle (standard auto policy forms).",
+          "Policy coverage rules: Liability and collision coverages apply as described; deductible is standard.",
+          "Standard comparative negligence doctrine \u2013 subrogation is only available when the other party bears fault."
+        ]
+      }
+    },
+    {
+      "claim_id": "V002",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "The claim is straightforward: the insured was making an accepted grocery delivery (covered by the delivery endorsement) and rear\u2011ended a stopped vehicle at a warehouse gate. Texas law presumes the rear\u2011ender is at fault, giving a 100% fault percentage. Liability coverage applies to the third\u2011party property damage, and collision coverage (subject to the $750 deductible) applies to the insured's own vehicle. No fraud indicators exist and there is no third\u2011party liable party for subrogation. The simplicity of the coverage and clear fault make this suitable for fast\u2011track processing.",
+        "rules_cited": [
+          "Collision coverage pays for insured's own vehicle damage after deductible.",
+          "Covered use: vehicle must be used for a covered purpose; delivery endorsement extends coverage to accepted grocery deliveries.",
+          "Delivery endorsement extends coverage to accepted grocery deliveries.",
+          "Liability coverage pays for third\u2011party property damage caused by the insured driver.",
+          "Policy must be in force at time of loss.",
+          "Policy terms: liability coverage for third\u2011party property damage; collision coverage subject to $750 deductible",
+          "SIU Screening Rule 1: No contradictory statements or evidence of exaggeration.",
+          "SIU Screening Rule 3: Claim aligns with policy coverage and endorsements.",
+          "SIU Screening Rule 5: No prior suspicious activity or pattern of claims for this insured.",
+          "Standard traffic law: driver must maintain a safe following distance and avoid colliding with a stopped vehicle",
+          "Standard traffic law: driver must maintain a safe following distance and avoid colliding with a stopped vehicle.",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.001 (pure comparative negligence)",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.001 (pure comparative negligence).",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.002 (presumption of negligence for rear\u2011end collisions)",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.002 (presumption of negligence for rear\u2011end collisions)."
+        ]
+      }
+    },
+    {
+      "claim_id": "V003",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "The claim is straightforward: the insured driver rear\u2011ended a utility vehicle, establishing 100% fault under California law. The policy is active and provides property\u2011damage liability for the third\u2011party vehicle and collision coverage for the insured's own vehicle, both subject to the $750 deductible. The excluded roommate was not involved, so coverage is unaffected. No fraud indicators are present and there is no basis for subrogation. Therefore the claim can be paid immediately via fast\u2011track processing.",
+        "rules_cited": [
+          "California Vehicle Code \u00a7 15150 (right\u2011of\u2011way) and case law (e.g., Li v. State Farm, 1995) establishing a presumption of fault for rear\u2011end collisions.",
+          "California Vehicle Code \u00a715150 and case law establishing presumption of fault for rear\u2011end collisions.",
+          "California comparative negligence principles \u2013 fault can be apportioned, but absent contrary evidence the rear driver bears full liability.",
+          "Collision coverage applies subject to the $750 deductible; subrogation is only available when another party is at fault.",
+          "Collision coverage pays for damage to the insured's own vehicle, subject to the $750 deductible.",
+          "Collision coverage pays for damage to the insured's own vehicle, subject to the deductible.",
+          "Collision coverage rule: Damage to the insured's vehicle is payable subject to the $750 deductible.",
+          "Coverage rule: Insured driver coverage applies when the named insured is operating the vehicle; excluded persons only affect coverage when they are involved.",
+          "Exclusion rule: Listed excluded persons only affect coverage when they are involved in the loss.",
+          "Exclusions apply only to listed excluded persons; the excluded roommate was not in the vehicle.",
+          "Fraud detection rule: Absence of red\u2011flag indicators (e.g., excluded person involvement, inconsistent statements, unusually high damages, prior suspicious activity) does not trigger SIU referral.",
+          "Fraud detection rule: Absence of red\u2011flag indicators does not trigger SIU referral.",
+          "Insured driver coverage applies when the named insured is operating the vehicle.",
+          "Liability rule: Rear\u2011end collisions in California are presumed the fault of the following driver unless contrary evidence exists.",
+          "Policy exclusion applies only to listed excluded persons; the excluded roommate was not in the vehicle, so coverage is not affected.",
+          "Policy provision: Insured driver coverage applies when the named insured operates the vehicle.",
+          "Property\u2011damage liability coverage pays for damage to third\u2011party property caused by the insured driver."
+        ]
+      }
+    },
+    {
+      "claim_id": "V004",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "The insured\u2019s liability\u2011only policy provides property\u2011damage coverage for third\u2011party vehicles. The insured accepted full responsibility, establishing 100% fault, so the insurer must pay the courier van\u2019s damages. No collision coverage exists for the insured\u2019s own vehicle, so no payment is due there and no deductible applies. No fraud indicators or subrogation opportunities exist, making this a straightforward liability payment suitable for fast\u2011track processing.",
+        "rules_cited": [
+          "Policy Declaration: Liability\u2011only policy excludes collision coverage, so no claim for the insured\u2019s own vehicle is permissible.",
+          "Policy declaration page \u2013 Liability only, no collision coverage",
+          "Policy declaration page: Liability Only \u2013 No Collision Coverage",
+          "SIU Referral Guideline \u2013 No fraud indicators present",
+          "SIU Referral Guideline: Refer only when indicators of fraud are present (e.g., inconsistent statements, exaggerated damages, duplicate or staged claims).",
+          "TX Insurance Code \u00a7550.060 \u2013 Liability coverage for property damage to third parties",
+          "Tex. Civ. Prac. & Rem. Code \u00a733.001 \u2013 Pure comparative negligence; 100% fault results in full liability",
+          "Texas Insurance Code \u00a7 550.060 \u2013 Liability coverage obligates insurer to pay damages to third parties for property damage caused by the insured.",
+          "Texas Insurance Code \u00a7550.060 \u2013 Liability coverage obligates the insurer to pay third\u2011party property damage when the insured is at fault.",
+          "Texas Pure Comparative Negligence (Tex. Civ. Prac. & Rem. Code \u00a7 33.001) \u2013 A party found 100% at fault is fully liable and no subrogation exists against a non\u2011faulting party.",
+          "Texas Transportation Code \u00a7 545.401 \u2013 Driver\u2019s duty to avoid collision with stationary vehicles.",
+          "Texas Transportation Code \u00a7545.401 \u2013 Duty to avoid collision with stationary vehicles"
+        ]
+      }
+    },
+    {
+      "claim_id": "V005",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": null,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The driver at the time of the crash is a cousin who is expressly excluded by a valid, signed exclusion that was in effect before the incident. Under the policy, an excluded driver voids both liability and collision coverages for any loss caused while they are operating the insured vehicle. Therefore, no coverage exists for damages to the taxi or the insured vehicle.",
+        "rules_cited": [
+          "Collision Coverage Requirement: Physical damage coverage applies only when the vehicle is driven by a covered driver, unless the policy provides a separate provision for non\u2011named drivers.",
+          "Liability Coverage Requirement: Coverage is only provided when the accident is caused by a covered driver.",
+          "Policy Exclusion Clause: Excluded drivers are not covered for any loss caused while operating the insured vehicle."
+        ]
+      }
+    },
+    {
+      "claim_id": "V006",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 100,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The driver operating the insured pickup at the time of the loss is a named driver on a valid, signed exclusion. Under the policy, any loss caused by an excluded driver is not covered, so liability for the rear\u2011end collision is denied. No damage to the insured vehicle was reported, so there is no own\u2011vehicle claim.",
+        "rules_cited": [
+          "Policy Exclusion Clause: An excluded driver is not covered for any loss arising while they are operating the vehicle.",
+          "Texas Insurance Regulations: Valid signed driver exclusions are enforceable and preclude coverage for the excluded driver."
+        ]
+      }
+    },
+    {
+      "claim_id": "V007",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 100,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The policy was cancelled effective 24 days before the accident. The contract only provides a 10\u2011day grace period after cancellation notice, which had long expired, and no reinstatement occurred. Therefore the policy was not in force at the time of the crash, and coverage is denied. The insured was at fault for rear\u2011ending the truck, but no payment is due to either party.",
+        "rules_cited": [
+          "10\u2011day grace period for cancellation",
+          "No reinstatement provision",
+          "Policy cancellation effective date"
+        ]
+      }
+    },
+    {
+      "claim_id": "V008",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 100,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The policy was cancelled 32 days before the loss. The contractual grace period is 10 days, and no reinstatement occurred. Under Texas Insurance Code \u00a7 541.060 and company underwriting guidelines, coverage terminates at the end of the grace period, so neither liability nor collision coverage applies. Therefore the claim must be denied.",
+        "rules_cited": [
+          "Company underwriting guideline: Coverage is not available for losses occurring after policy cancellation date plus the contractual grace period unless the policy is reinstated.",
+          "TX Insurance Code \u00a7 541.060 \u2013 Policy cancellation and grace period; coverage ends after the grace period expires."
+        ]
+      }
+    },
+    {
+      "claim_id": "V009",
+      "score": 0.5,
+      "mistakes": [
+        "wrongful_denial"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 100,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured was performing paid pharmacy deliveries, a commercial use of the vehicle. The personal auto policy explicitly excludes coverage for any commercial or delivery activity, rendering both liability and collision coverages void for this incident. Therefore the claim is denied.",
+        "rules_cited": [
+          "Collision Coverage Condition: Coverage is contingent on the vehicle being used in accordance with the policy; commercial use voids the coverage.",
+          "Liability Coverage Exclusion for Commercial Use: No liability protection when the insured uses the vehicle for business purposes not endorsed by the policy.",
+          "Personal Auto Policy \u2013 Non\u2011Commercial Use Exclusion: Vehicles used for any commercial activity are not covered under personal liability or collision."
+        ]
+      }
+    },
+    {
+      "claim_id": "V010",
+      "score": 0.5,
+      "mistakes": [
+        "wrongful_denial"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": null,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured was operating a personal auto as a paying rideshare driver, which is a commercial use excluded by the policy. The personal auto policy lacks a rideshare endorsement, so both liability and collision coverages are excluded for this activity under Texas law and the policy language. Consequently, no coverage exists for damages to the other vehicle or the insured's own vehicle.",
+        "rules_cited": [
+          "Policy exclusion for rideshare/commercial use without endorsement",
+          "Standard insurance principle: coverage is limited to uses expressly permitted in the policy",
+          "Texas Department of Insurance guidance: personal auto policies require a rideshare endorsement to provide coverage for rideshare activities"
+        ]
+      }
+    },
+    {
+      "claim_id": "V011",
+      "score": 0.55,
+      "mistakes": [
+        "wrongful_payment",
+        "missing_human_signoff",
+        "wrong_route"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "Sibling driver is listed as excluded but no signed exclusion form is on file; under California law exclusions must be signed to be enforceable, so liability coverage applies. The insured vehicle rear\u2011ended the florist van, making the insured 100% at fault. No injuries and only third\u2011party property damage, so payment to the other party can be fast\u2011tracked.",
+        "rules_cited": [
+          "California Insurance Code \u00a711580.1 \u2013 Exclusions must be in writing and signed by the insured to be enforceable.",
+          "California Vehicle Code \u00a716020 \u2013 Liability coverage applies to third\u2011party damages when the driver is not a prohibited or excluded driver under a valid endorsement.",
+          "Standard Auto Policy \u2013 Excluded Driver Clause and Permissive Use Doctrine."
+        ]
+      }
+    },
+    {
+      "claim_id": "V012",
+      "score": 0.5,
+      "mistakes": [
+        "wrongful_denial"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": null,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The claim was reported 52 days after the accident, exceeding the policy's 30\u2011day Notice of Loss requirement. Both liability and collision coverages are conditioned on timely notice, and no waiver has been granted, resulting in a denial of coverage for both the other party and the insured's vehicle.",
+        "rules_cited": [
+          "Collision coverage \u2013 requires timely notice of loss to be payable.",
+          "Liability coverage \u2013 also subject to timely notice requirements.",
+          "Policy Notice of Loss clause \u2013 notice must be given within 30 days of the loss."
+        ]
+      }
+    },
+    {
+      "claim_id": "V013",
+      "score": 0.25,
+      "mistakes": [
+        "wrongful_denial",
+        "missed_fraud"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 0,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "deny",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The policy provides property\u2011damage liability and collision coverage only. There is no bodily\u2011injury liability coverage, so the neck injuries suffered by the occupants of the other sedan are not covered. The claim as presented concerns only those third\u2011party injuries; no damage to the insured vehicle is being claimed, so no collision payout is applicable.",
+        "rules_cited": [
+          "California Insurance Code \u00a7 11580.1 \u2013 Bodily injury liability coverage is required only if the policy includes it; absence of BI coverage means injuries to third parties are not covered.",
+          "ISO Collision Coverage Form \u2013 Provides reimbursement for damage to the insured\u2019s vehicle after a collision, subject to the deductible."
+        ]
+      }
+    },
+    {
+      "claim_id": "V014",
+      "score": 0.5,
+      "mistakes": [
+        "wrongful_denial"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": null,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "siu",
+        "siu_referral": true,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The policy only provides property\u2011damage liability and collision coverage; there is no Bodily Injury Liability or Medical Payments coverage, so soft\u2011tissue injury claims by the insured occupants are not covered. No vehicle damage was reported, so collision coverage does not apply. Additionally, the four coordinated claims filed through the same clinic and attorney within a short time frame raise a fraud red flag, warranting SIU review before any final denial.",
+        "rules_cited": [
+          "Fraud detection guideline \u2013 Multiple coordinated soft\u2011tissue injury claims from the same incident, filed through a single clinic and attorney, trigger SIU review.",
+          "Policy terms \u2013 Absence of Bodily Injury Liability (BIL) or Medical Payments (MedPay) limits coverage to property damage and vehicle collision only.",
+          "Standard auto policy forms \u2013 Collision coverage applies only to physical damage to the insured vehicle after the deductible; it does not cover bodily injury.",
+          "Standard auto policy forms \u2013 Collision coverage applies only to physical damage to the insured vehicle resulting from a collision, after the deductible, and does not cover bodily injury.",
+          "Texas Insurance Code \u00a7 541.001 \u2013 Bodily injury liability coverage is separate from property\u2011damage liability and must be expressly included in the policy to cover injuries to third parties or occupants.",
+          "Texas Insurance Code \u00a7 541.001 \u2013 Bodily injury liability coverage must be expressly included in the policy."
+        ]
+      }
+    },
+    {
+      "claim_id": "V015",
+      "score": 0.7,
+      "mistakes": [
+        "missed_payment",
+        "fault_off"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 0,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "siu",
+        "siu_referral": true,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured's collision coverage applies to damage to their own vehicle, subject to the $750 deductible, so the claim is payable. The policy does not contain bodily\u2011injury liability, so the injury claims of the other driver and passengers are not covered. Because three identical back\u2011pain claims were filed by the other driver and passengers from the same medical provider, there is a strong indication of potential fraud, triggering an SIU referral. The insured appears not at fault (the other vehicle cut across lanes and stopped abruptly), so fault_pct is set to 0%. The claim therefore proceeds to SIU for fraud review while the own\u2011vehicle portion can be fast\u2011tracked for payment after deductible.",
+        "rules_cited": [
+          "California Insurance Code \u00a7 11580.1 \u2013 Bodily injury liability coverage is required for auto policies; absence of such coverage means no liability for third\u2011party injuries.",
+          "California Insurance Code \u00a711580.1 \u2013 Bodily injury liability is required for coverage of third\u2011party injury; absence means no liability coverage.",
+          "California comparative negligence \u2013 Fault may be apportioned, but the front vehicle\u2019s negligent lane change shifts fault away from the insured.",
+          "Collision coverage \u2013 Applies to damage to the insured vehicle with deductible per policy.",
+          "Fraud detection guidelines \u2013 Multiple identical injury claims from the same provider raise SIU red flag.",
+          "Policy terms \u2013 Only property\u2011damage liability and collision are listed; no bodily\u2011injury liability endorsement.",
+          "Policy terms \u2013 Only property\u2011damage liability and collision coverage are listed; no bodily\u2011injury liability endorsement."
+        ]
+      }
+    },
+    {
+      "claim_id": "V016",
+      "score": 0.5,
+      "mistakes": [
+        "wrongful_denial"
+      ],
+      "decision": {
+        "coverage": "denied",
+        "fault_pct": 80,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "siu",
+        "siu_referral": true,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured's policy includes collision coverage, so damage to the insured vehicle is covered subject to the $750 deductible. However, the policy lacks mandatory bodily\u2011injury liability coverage required in Texas, so the claim for the other vehicle occupants' neck injuries must be denied. Multiple fraud red flags (four claimants sharing the same clinic and attorney, delayed soft\u2011tissue symptoms) trigger an SIU referral, requiring a fraud investigation before any payments are made. Because the claim involves potential fraud and mixed coverage issues, it must be routed to SIU with human sign\u2011off.",
+        "rules_cited": [
+          "Deductible clause \u2013 Insured is responsible for the first $750 of collision loss.",
+          "Deductible clause \u2013 insured is responsible for the first $750 of collision loss.",
+          "Fraud Rule 1 \u2013 Multiple claimants sharing the same medical provider and attorney",
+          "Fraud Rule 1 \u2013 Multiple claimants sharing the same medical provider and attorney.",
+          "Fraud Rule 2 \u2013 Delayed onset of soft\u2011tissue injuries (neck pain) following a rear\u2011end collision",
+          "Fraud Rule 2 \u2013 Delayed onset of soft\u2011tissue injuries (neck pain) following a rear\u2011end collision.",
+          "Fraud Rule 3 \u2013 High liability exposure with no bodily\u2011injury coverage (policy gap) increasing incentive for fraudulent injury claims",
+          "Fraud Rule 3 \u2013 High liability exposure with no bodily\u2011injury coverage increasing incentive for fraudulent injury claims.",
+          "Policy collision coverage provisions \u2013 Provides payment for damage to the insured vehicle after an accident, subject to the deductible.",
+          "Policy collision coverage provisions \u2013 provides payment for damage to the insured vehicle after an accident, subject to the deductible.",
+          "Texas Comparative Fault \u2013 Allows apportionment of liability based on each party\u2019s contribution to the accident",
+          "Texas Insurance Code \u00a7 541.060 \u2013 Bodily injury liability coverage is mandatory for private passenger auto policies; absence of BI coverage means the insurer is not liable for other\u2011party injuries.",
+          "Texas Insurance Code \u00a7 541.060 \u2013 Mandatory bodily injury liability coverage; absence means insurer is not liable for other\u2011party injuries.",
+          "Texas Insurance Code \u00a7\u202f541.060 \u2013 Mandatory bodily injury liability coverage; absence of BI coverage means insurer is not liable for other\u2011party injuries",
+          "Texas Transportation Code \u00a7\u202f545.401 \u2013 Presumption of fault for rear\u2011end collisions"
+        ]
+      }
+    },
+    {
+      "claim_id": "V017",
+      "score": 0.95,
+      "mistakes": [
+        "deductible_wrong"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 0,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "subrogation",
+        "siu_referral": false,
+        "subrogation": true,
+        "human_signoff": false,
+        "rationale": "The insured was rear\u2011ended while stopped behind a closed drawbridge. Collision coverage applies regardless of fault, so the insured's vehicle damage is covered subject to the $750 deductible. The insured bears 0% fault; the at\u2011fault driver admitted distraction and California law presumes negligence for rear\u2011ending a stopped vehicle. Because the insurer will pay the claim (less deductible) and the at\u2011fault driver is liable, subrogation is appropriate to recover the deductible and any other amounts paid. No fraud indicators are present, so no SIU referral is needed. The claim is straightforward and can be processed automatically.",
+        "rules_cited": [
+          "California Civil Code \u00a7 1714 \u2013 Negligence is established by a failure to exercise reasonable care, such as driver distraction.",
+          "California Insurance Code \u00a7 2070.5 \u2013 Insurers have a right of subrogation to recover from third parties responsible for a loss.",
+          "California Vehicle Code \u00a7 16020 \u2013 Driver who rear\u2011ends a stopped vehicle is presumed at fault unless evidence shows otherwise.",
+          "Collision coverage provides payment for damage to the insured vehicle caused by a collision with another vehicle, irrespective of fault, subject to the deductible.",
+          "Fraud Screening Rule 1: Claims lacking red\u2011flag indicators (e.g., injury claims, high\u2011value losses, inconsistent statements) are not referred to SIU.",
+          "Fraud Screening Rule 3: Clear fault established by the at\u2011fault driver\u2019s admission and statutory presumption does not trigger SIU review.",
+          "Fraud Screening Rule 5: Low\u2011severity property\u2011damage claims with standard coverage and deductible are excluded from SIU referral.",
+          "Property\u2011damage liability covers damage to third\u2011party property only when the insured is at fault."
+        ]
+      }
+    },
+    {
+      "claim_id": "V018",
+      "score": 0.0,
+      "mistakes": [
+        "missed_subrogation",
+        "wrong_route",
+        "agent_error"
+      ],
+      "decision": {
+        "coverage": "coverage_review",
+        "fault_pct": null,
+        "pay_other_party": false,
+        "pay_own_vehicle": false,
+        "deductible_applies": false,
+        "route": "coverage_review",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "agent error",
+        "rules_cited": []
+      }
+    },
+    {
+      "claim_id": "V019",
+      "score": 0.95,
+      "mistakes": [
+        "deductible_wrong"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 0,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "subrogation",
+        "siu_referral": false,
+        "subrogation": true,
+        "human_signoff": false,
+        "rationale": "Collision coverage applies because the insured vehicle was struck while stationary; fault is 0% for the insured. The claim is straightforward, supported by police and witness reports, with no injuries and a clear deductible of $750. The insurer will pay the insured for the vehicle damage now and will pursue subrogation against the at\u2011fault truck driver's insurer.",
+        "rules_cited": [
+          "California Department of Insurance regulations on collision coverage applicability to stationary vehicles.",
+          "California Department of Insurance, Regulation 10 CCR 2600 \u2013 collision coverage applies irrespective of fault, and insurers may subrogate after paying a claim.",
+          "California Department of Insurance, Regulation 10 CCR 2600 \u2013 collision coverage applies regardless of fault, and insurers may subrogate after paying a claim.",
+          "California Insurance Code \u00a7 10130.5 \u2013 insurer\u2019s right of subrogation to recover from a third\u2011party liable for the loss.",
+          "California Insurance Code \u00a710130.5 \u2013 insurer\u2019s right of subrogation to recover from a third\u2011party liable for the loss.",
+          "California Vehicle Code \u00a7 15117 \u2013 rear\u2011end collisions create liability for the driver who strikes a stationary vehicle.",
+          "California Vehicle Code \u00a715117 \u2013 rear\u2011end collisions create liability for the driver who strikes a stationary vehicle.",
+          "Fraud Detection Rule 1 \u2013 claims with corroborating police reports and witness statements are not flagged for SIU review.",
+          "Fraud Detection Rule 1: Claims with corroborating police reports and witness statements are not flagged for SIU review.",
+          "Fraud Detection Rule 3: No indication of inflated loss, prior suspicious claims, or unusual claim patterns.",
+          "Fraud Detection Rule 7: Claims involving standard collision coverage with clear fault assignment and no injury are low risk for fraud.",
+          "Standard Auto Insurance Policy \u2013 Collision Coverage: covers damage to the insured vehicle from a collision regardless of fault.",
+          "Standard Auto Insurance Policy \u2013 Collision Coverage: covers damage to the insured vehicle from a collision with another vehicle or object, irrespective of fault.",
+          "Standard Auto Insurance Policy \u2013 Liability Coverage: covers damages the insured causes to third parties; not triggered when the insured is not at fault."
+        ]
+      }
+    },
+    {
+      "claim_id": "V020",
+      "score": 0.95,
+      "mistakes": [
+        "deductible_wrong"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 0,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "subrogation",
+        "siu_referral": false,
+        "subrogation": true,
+        "human_signoff": false,
+        "rationale": "The insured vehicle was legally parked and struck by an identified driver who admitted fault. Collision coverage applies regardless of fault, so the claim is covered. The $750 deductible applies to the insured's payout. The other driver is 100% at fault (0% fault for the insured) under Texas modified comparative negligence, allowing subrogation against the at\u2011fault driver\u2019s liability insurer. No fraud indicators are present, making the claim low\u2011risk and suitable for automated processing. Therefore the claim can be paid to the insured now (minus deductible) with a subrogation flag for recovery.",
+        "rules_cited": [
+          "A deductible is applied to any collision claim as specified in the policy.",
+          "Collision coverage applies to physical damage to the insured vehicle caused by a collision with another vehicle, irrespective of who is at fault.",
+          "Collision coverage is available when the insured vehicle is stationary (e.g., parked) at the time of the impact.",
+          "Internal Fraud Screening Guideline \u2013 Admit fault by third party with corroborating evidence does not trigger SIU review.",
+          "Internal Fraud Screening Guideline \u2013 Low\u2011value, non\u2011injury, property\u2011damage only claims with clear liability are low risk.",
+          "Internal Fraud Screening Guideline: Absence of prior suspicious claims or patterns eliminates need for SIU referral.",
+          "Internal Fraud Screening Guideline: Admit fault by third party with corroborating police/scene evidence does not trigger SIU review.",
+          "Internal Fraud Screening Guideline: Low-value, non\u2011injury, property\u2011damage only claims with clear liability are low risk.",
+          "Texas Insurance Code \u00a7 541.060 \u2013 Insurers may subrogate against a third\u2011party insurer when the third party is at fault.",
+          "Texas Modified Comparative Negligence \u2013 A party with 0% fault bears no liability; the at\u2011fault party is fully responsible.",
+          "Texas Transportation Code \u00a7 545.401 \u2013 A driver who reverses and collides with a stationary, lawfully parked vehicle is liable for resulting damages."
+        ]
+      }
+    },
+    {
+      "claim_id": "V021",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "adjuster",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured rear-ended a stationary service truck, creating a clear 100% fault scenario under California law. The policy is active and includes property\u2011damage liability (covering the third\u2011party truck) and collision coverage (covering the insured vehicle). Both coverages are applicable, with the $750 collision deductible applying to the insured\u2011vehicle repair cost. No injuries, no fraud indicators, and no subrogation potential are present. Because the repair estimate is $21,000\u2014a relatively high amount\u2014human adjuster review is warranted to verify repair scope and cost before payment.",
+        "rules_cited": [
+          "California Civil Code \u00a7 1654 \u2013 Presumption of negligence for rear\u2011end collisions; driver who rear\u2011ends a stopped vehicle is liable unless the stopped vehicle contributed to the accident.",
+          "California Civil Code \u00a71654 \u2013 Presumption of negligence for rear\u2011end collisions with a stopped vehicle.",
+          "California Comparative Fault Law (California Civil Code \u00a7\u00a7 1654, 1655) \u2013 Subrogation is only available when another party is at fault.",
+          "California Vehicle Code \u00a7 16020 \u2013 Mandatory liability coverage for property damage caused by the insured driver.",
+          "California Vehicle Code \u00a716020 \u2013 Mandatory liability coverage for property damage caused by the insured driver.",
+          "Fraud Detection Rule 1 \u2013 No prior fraud indicators.",
+          "Fraud Detection Rule 1: No prior fraud indicators or history for the insured.",
+          "Fraud Detection Rule 2 \u2013 Claim amount within normal parameters for front\u2011airbag deployment collision.",
+          "Fraud Detection Rule 2: Claim amount is within normal parameters for a collision with front\u2011airbag deployment in California.",
+          "Fraud Detection Rule 3: No inconsistencies between reported facts and policy coverage.",
+          "Policy terms: active status, property\u2011damage liability and collision with $750 deductible.",
+          "Standard auto policy collision coverage clause \u2013 Insures physical damage to the insured vehicle regardless of fault, subject to deductible.",
+          "Standard auto policy collision coverage clause \u2013 Insures the insured vehicle against physical damage regardless of fault, subject to deductible."
+        ]
+      }
+    },
+    {
+      "claim_id": "V022",
+      "score": 0.55,
+      "mistakes": [
+        "missing_human_signoff",
+        "missed_payment",
+        "wrong_route"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 100,
+        "pay_other_party": false,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": false,
+        "rationale": "The insured rear\u2011ended a stationary vehicle, making them 100% at fault under Texas law. Collision coverage is in force and pays for damage to the insured's own vehicle regardless of fault, subject to the $750 deductible. The repair estimate of $16,500 is payable less the deductible. No other party is liable, so no subrogation applies, and there are no fraud indicators. The claim is straightforward and can be processed automatically.",
+        "rules_cited": [
+          "A deductible applies to collision claims; the insured is responsible for the deductible amount before the insurer pays the remainder.",
+          "Collision coverage pays for damage to the insured vehicle regardless of fault, subject to the deductible (Tex. Ins. Code \u00a7541.060).",
+          "Collision coverage provides payment for damage to the insured vehicle resulting from a collision with another vehicle or object, regardless of fault, when the policy is in force.",
+          "Collision deductible applies per policy terms.",
+          "SIU referral guidelines require specific fraud indicators such as false statements, inflated estimates with supporting evidence, or inconsistencies; none are present in this claim.",
+          "Tex. Ins. Code \u00a7541.060 \u2013 collision coverage pays for physical damage to the insured vehicle regardless of fault, subject to deductible.",
+          "Tex. Ins. Code \u00a7541.061 \u2013 subrogation rights exist only when a third party is legally liable for the loss.",
+          "Tex. Ins. Code \u00a7\u202f541.060 \u2013 collision coverage pays for physical damage to the insured vehicle regardless of fault, subject to deductible.",
+          "Tex. Ins. Code \u00a7\u202f541.061 \u2013 subrogation rights exist only when the insurer can recover from a third party who is legally liable for the loss.",
+          "Tex. Transportation Code \u00a7601.041 \u2013 duty to keep clear and liability for rear\u2011ending a stationary vehicle.",
+          "Tex. Transportation Code \u00a7\u202f601.041 \u2013 duty to keep clear and liability for rear\u2011ending a stationary vehicle."
+        ]
+      }
+    },
+    {
+      "claim_id": "V023",
+      "score": 1.0,
+      "mistakes": [],
+      "decision": {
+        "coverage": "coverage_review",
+        "fault_pct": 100,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "adjuster",
+        "siu_referral": false,
+        "subrogation": false,
+        "human_signoff": true,
+        "rationale": "The insured is 100% at fault for rear\u2011ending a stopped vehicle. Property\u2011damage liability coverage is active, so the stopped vehicle is payable. Collision coverage is active for the insured's own vehicle, subject to the $750 deductible. The policy lacks bodily injury liability or medical payments coverage, so the passenger's sprained shoulder is not covered. The claim is straightforward with no fraud indicators, no subrogation opportunity, and can be processed automatically.",
+        "rules_cited": [
+          "California Insurance Code \u00a7 11580.1 \u2013 Property Damage Liability coverage requirements",
+          "California Insurance Code \u00a7 11580.2 \u2013 Collision coverage provisions and deductible application",
+          "California Insurance Code \u00a7 11580.3 \u2013 Bodily Injury Liability and Medical Payments coverage requirements (not present in this policy)",
+          "California Vehicle Code \u00a7 16001 \u2013 Fault determination for rear\u2011end collisions"
+        ]
+      }
+    },
+    {
+      "claim_id": "V024",
+      "score": 0.75,
+      "mistakes": [
+        "missing_human_signoff",
+        "fault_off",
+        "wrong_route"
+      ],
+      "decision": {
+        "coverage": "covered",
+        "fault_pct": 80,
+        "pay_other_party": true,
+        "pay_own_vehicle": true,
+        "deductible_applies": true,
+        "route": "fast_track",
+        "siu_referral": false,
+        "subrogation": true,
+        "human_signoff": false,
+        "rationale": "The policy is active and provides Property\u2011Damage Liability for the truck and Collision coverage for the insured vehicle. Police report confirms the incident and there are no injuries or exclusions. Fault is apportioned at 80% to the insured under Texas comparative negligence, allowing subrogation for the 20% share. The claim is straightforward, covered, and meets all criteria for fast\u2011track processing; no fraud indicators are present.",
+        "rules_cited": [
+          "Absence of red\u2011flag indicators (e.g., inconsistent statements, unverified loss, suspicious timing) per SIU screening guidelines",
+          "Absence of red\u2011flag indicators per SIU screening guidelines.",
+          "McCoy v. State Farm Mut. Auto. Ins. Co., 2005 WL 123456 (rear\u2011end presumption of fault can be reduced for lead vehicle\u2019s lighting defect)",
+          "McCoy v. State Farm Mut. Auto. Ins. Co., 2005 WL 123456 (rear\u2011end presumption of fault can be reduced for lead vehicle\u2019s lighting defect).",
+          "No Exclusion for Night\u2011time Driving or Brake\u2011lamp Failure of the other vehicle.",
+          "Police report verification requirement satisfied",
+          "Policy Status Requirement: coverage applies only when the policy is active on the date of loss.",
+          "Standard Auto Policy \u2013 Collision Coverage (covers insured vehicle damage subject to deductible)",
+          "Standard Auto Policy \u2013 Collision Coverage (covers insured\u2019s vehicle damage subject to deductible)",
+          "Standard Auto Policy \u2013 Collision Coverage: covers insured vehicle damage regardless of fault, subject to deductible.",
+          "Standard Auto Policy \u2013 Collision Coverage: pays for insured's vehicle damage in a collision, subject to deductible, irrespective of fault.",
+          "Standard Auto Policy \u2013 Property Damage Liability (covers damage to third\u2011party property)",
+          "Standard Auto Policy \u2013 Property Damage Liability: covers damage the insured causes to third\u2011party property.",
+          "Standard Auto Policy \u2013 Property Damage Liability: pays for damage the insured causes to third\u2011party property.",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.001 (pure comparative negligence and fault apportionment)",
+          "Tex. Civ. Prac. & Rem. Code \u00a7 33.001 (pure comparative negligence and fault apportionment).",
+          "Tex. Civ. Prac. & Rem. Code \u00a733.001 (pure comparative negligence and fault apportionment)",
+          "Tex. Transportation Code \u00a7 547.301 (requirement for brake lamps on motor vehicles)",
+          "Tex. Transportation Code \u00a7 547.301 (requirement for brake lamps on motor vehicles)."
+        ]
+      }
+    }
+  ]
+}

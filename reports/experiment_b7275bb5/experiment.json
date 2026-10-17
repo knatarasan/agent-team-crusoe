@@ -1,0 +1,302 @@
+{
+  "status": "stopped_after_cycle_at_user_request",
+  "phase": "cycle 2 complete; final comparisons not executed",
+  "initial_version": 0,
+  "max_cycles": 3,
+  "threshold": 0.01,
+  "workers": 4,
+  "claim_ids": {
+    "train": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30",
+      "31",
+      "32",
+      "33",
+      "34",
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45",
+      "46",
+      "47",
+      "48",
+      "49",
+      "50"
+    ],
+    "validation": [
+      "V001",
+      "V002",
+      "V003",
+      "V004",
+      "V005",
+      "V006",
+      "V007",
+      "V008",
+      "V009",
+      "V010",
+      "V011",
+      "V012",
+      "V013",
+      "V014",
+      "V015",
+      "V016",
+      "V017",
+      "V018",
+      "V019",
+      "V020",
+      "V021",
+      "V022",
+      "V023",
+      "V024"
+    ],
+    "hidden_test": [
+      "H001",
+      "H002",
+      "H003",
+      "H004",
+      "H005",
+      "H006",
+      "H007",
+      "H008",
+      "H009",
+      "H010",
+      "H011",
+      "H012",
+      "H013",
+      "H014",
+      "H015",
+      "H016",
+      "H017",
+      "H018",
+      "H019",
+      "H020",
+      "H021",
+      "H022",
+      "H023",
+      "H024"
+    ]
+  },
+  "configuration": {
+    "worker_model": "openai/gpt-oss-120b",
+    "optimizer_model": "deepseek-ai/DeepSeek-V4-Pro",
+    "endpoint": "https://api.inference.crusoecloud.com/v1",
+    "candidate_edits_per_cycle": 3,
+    "datasets": {
+      "train": {
+        "path": "G:\\Projects\\agent-team-crusoe\\data\\dataset.csv",
+        "sha256": "62b1ca01c0c362dc26de3b0d5e32dd90798de2d61fbc34c3c432502ee330021a"
+      },
+      "train_gold": {
+        "path": "G:\\Projects\\agent-team-crusoe\\data\\gold_structured.jsonl",
+        "sha256": "79b196df77c387fcc6137c56d59302a8f5941b76deffefadce68b8b6082bb9a4"
+      },
+      "validation": {
+        "path": "G:\\Projects\\agent-team-crusoe\\data\\validation.jsonl",
+        "sha256": "37fe0f5cf464065340e72a194d5b719b231e1fdd5a2e69ed37d4cfbd23094ac7"
+      },
+      "hidden_test": {
+        "path": "G:\\Projects\\agent-team-crusoe\\data\\hidden_test.jsonl",
+        "sha256": "a9e5962cc4909f9e3634224dc4917c82354c0bb922a63b593375e6a6f47d8218"
+      }
+    }
+  },
+  "score_weights": {
+    "wrongful_denial": 10,
+    "wrongful_payment": 5,
+    "missed_payment": 5,
+    "missed_fraud": 5,
+    "injury_fast_tracked": 3,
+    "missing_human_signoff": 3,
+    "missed_subrogation": 2,
+    "fault_off": 1,
+    "deductible_wrong": 1,
+    "over_escalated": 1,
+    "wrong_route": 1
+  },
+  "resumed_baseline_from": "G:\\Projects\\agent-team-crusoe\\reports\\experiment_4d0a2e44",
+  "cycles_completed": 2,
+  "final_version": 1,
+  "candidates_evaluated": 6,
+  "accepted_edits": [
+    {
+      "cycle": 1,
+      "edit": "add [decider/all] If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed liability, do not fast-track. Route to an adjuster with human sign-off.",
+      "accepted": true,
+      "reason": "validation gain +0.083",
+      "val_score": 0.8770833333333333,
+      "gain": 0.08333333333333326,
+      "eligible": true,
+      "edit_details": {
+        "op": "add",
+        "rule_id": null,
+        "text": "If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed liability, do not fast-track. Route to an adjuster with human sign-off.",
+        "role": "decider",
+        "state": "all",
+        "rationale": "Claims 46, 43, 44, 47, and 48 were incorrectly fast-tracked or routed without human sign-off despite injuries, large estimates, or disputed liability. These require adjuster review to ensure proper payment and fault determination.",
+        "source_claim_ids": [
+          "46",
+          "43",
+          "44",
+          "47",
+          "48"
+        ]
+      },
+      "validation_summary": {
+        "claims": 24,
+        "cost_weighted_score": 0.877,
+        "exact_match": 0.375,
+        "wrongful_denials": 3,
+        "straight_through_rate": 0.208,
+        "siu_hit_rate": 0.75,
+        "subrogation_caught": 1.0,
+        "by_category": {
+          "adjuster": 0.938,
+          "coverage_review": 0.675,
+          "deny": 1.0,
+          "fast_track": 0.988,
+          "siu": 0.787,
+          "subrogation": 0.875
+        },
+        "errors": 0
+      }
+    }
+  ],
+  "validation_history": [
+    0.7937500000000001,
+    0.8770833333333333
+  ],
+  "results": {
+    "training_baseline": {
+      "claims": 50,
+      "cost_weighted_score": 0.819,
+      "exact_match": 0.24,
+      "wrongful_denials": 5,
+      "straight_through_rate": 0.42,
+      "siu_hit_rate": 1.0,
+      "subrogation_caught": 1.0,
+      "by_category": {
+        "adjuster": 0.558,
+        "coverage_review": 0.586,
+        "deny": 1.0,
+        "fast_track": 0.882,
+        "siu": 0.812,
+        "subrogation": 0.938
+      },
+      "errors": 0
+    },
+    "training_v1_rerun": {
+      "claims": 50,
+      "cost_weighted_score": 0.814,
+      "scored_mistake_claims": 37,
+      "source": "cycle 2 console output; score rounded to three decimals",
+      "per_claim_predictions_persisted": false
+    },
+    "validation_baseline": {
+      "claims": 24,
+      "cost_weighted_score": 0.794,
+      "exact_match": 0.25,
+      "wrongful_denials": 6,
+      "straight_through_rate": 0.333,
+      "siu_hit_rate": 1.0,
+      "subrogation_caught": 1.0,
+      "by_category": {
+        "adjuster": 0.825,
+        "coverage_review": 0.512,
+        "deny": 1.0,
+        "fast_track": 1.0,
+        "siu": 0.487,
+        "subrogation": 0.938
+      },
+      "errors": 0
+    },
+    "validation_selected_v1": {
+      "claims": 24,
+      "cost_weighted_score": 0.877,
+      "exact_match": 0.375,
+      "wrongful_denials": 3,
+      "straight_through_rate": 0.208,
+      "siu_hit_rate": 0.75,
+      "subrogation_caught": 1.0,
+      "by_category": {
+        "adjuster": 0.938,
+        "coverage_review": 0.675,
+        "deny": 1.0,
+        "fast_track": 0.988,
+        "siu": 0.787,
+        "subrogation": 0.875
+      },
+      "errors": 0
+    },
+    "validation_gain_percentage_points": 8.333333333333325,
+    "observed_validation_improvement": true,
+    "observed_training_improvement": false,
+    "hidden_test_evaluated": false,
+    "generalization_demonstrated": false,
+    "repeatability_check": {
+      "same_playbook": 0,
+      "overlapping_claims": 26,
+      "first_v0_cost_weighted_score": 0.8346153846153845,
+      "second_v0_cost_weighted_score": 0.8192307692307692,
+      "score_difference_percentage_points": -1.538461538461533,
+      "decisions_with_changed_fields": 8,
+      "changed_claim_ids": [
+        "6",
+        "7",
+        "9",
+        "10",
+        "29",
+        "30",
+        "34",
+        "50"
+      ],
+      "same_dataset_gold_and_weights": true,
+      "note": "Observational repeatability check using two existing v0 executions. Concurrency and call timing differed; this is not a controlled multi-seed study. No extra model calls were made."
+    }
+  },
+  "tests_passed": 26,
+  "limitations": [
+    "The hidden test comparison was not executed because the user requested stopping after the current cycle.",
+    "Validation and hidden test fixtures are synthetic and share existing demo scenario families; gold is not insurance-expert reviewed.",
+    "Each candidate was measured once; two existing v0 runs on 26 overlapping claims differed by 1.54 percentage points and 8 decision records.",
+    "The acceptance threshold is 1 percentage point and can therefore admit model variability; repeated paired validation is needed.",
+    "The gate prevents increases in wrongful denials but does not require zero; selected v1 still has three validation wrongful denials.",
+    "Intermediate per-claim training predictions and selected-candidate validation predictions were not checkpointed before the stop; their saved summaries and console score are reported without reconstructing missing decisions.",
+    "The runner currently lacks a graceful stop-at-cycle flag and a request/time budget. It was stopped using the saved cycle checkpoint.",
+    "The supervisor sees current training failures and the current playbook; it does not yet receive a persistent history of rejected edits or full intermediate agent traces."
+  ]
+}

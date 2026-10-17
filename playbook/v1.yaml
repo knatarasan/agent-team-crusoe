@@ -1,0 +1,21 @@
+version: 1
+rules:
+- id: R1
+  text: If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed liability,
+    do not fast-track. Route to an adjuster with human sign-off.
+  role: decider
+  state: all
+  source_claim_ids:
+  - '46'
+  - '43'
+  - '44'
+  - '47'
+  - '48'
+  added_in: 1
+  status: active
+  score_delta: 0.0833
+changelog:
+- 'v0: day-1 team. Base prompts only, no house rules.'
+- 'v1: add [decider/all] If the claim involves any bodily injury, airbag deployment, a repair estimate over $10,000, or disputed
+  liability, do not fast-track. Route to an adjuster with human sign-off. | val +0.083 | from claims [''46'', ''43'', ''44'',
+  ''47'', ''48'']'
