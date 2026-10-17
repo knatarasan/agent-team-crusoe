@@ -26,6 +26,31 @@ Options for `run`: `--k 3` caps the edits proposed per run, and `--threshold 0.0
 
 To start over, delete `runs/` and every `playbook/vN.yaml` except `v0.yaml`.
 
+## Interactive demo dashboard
+
+```bash
+uv run triage dashboard
+# open http://localhost:8765
+```
+
+The dashboard shows the improvement curve, keep/rollback decisions, versioned rules,
+source claims, and baseline-versus-best evidence. Use **Replay experiment** for a short
+walkthrough and **Refresh data** after a new run completes. It makes no model calls.
+
+Current `runs/history.csv` and `runs/state.json` take precedence. If these are absent,
+the UI explicitly shows the archived four-run report from commit `1455bf4`, bundled
+in `dashboard/recording.json`: 90.6% → 95.7% cost-weighted score, 4 → 0 wrongful denials.
+These are working-set results; unseen-task performance has not been evaluated.
+
+To export a portable dashboard that opens directly in a browser:
+
+```bash
+uv run triage dashboard --export-only
+# open reports/demo/index.html
+```
+
+The existing `triage history` report remains available.
+
 ## What each run writes
 
 ```

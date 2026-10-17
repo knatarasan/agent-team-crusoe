@@ -199,3 +199,44 @@ def test_rolled_back_edits_cannot_be_reproposed(tmp_path):
     state = load_state(runs_dir)
     assert state["pending_edits"] == [] and state["next_version"] == 0  # blocked, so run 3 re-runs the best config
     assert "already tried in run 2 and rolled back" in (runs_dir / "run_002" / "changes.md").read_text()
+
+
+def test_summary_only_history_uses_labelled_current_failure_evidence(tmp_path):
+    from triage import playbook as pbmod
+    from triage.runs import load_state, run_once
+
+    pb_dir, runs_dir = tmp_path / "playbook", tmp_path / "runs"
+    pbmod.save(Playbook(), pb_dir)
+    kw = dict(threshold=0.02, workers=2, runs_dir=runs_dir, playbook_dir=pb_dir)
+    run_once(_claims(), _team, lambda f, p, h: [Edit(op="add", text="Deny when an excluded driver was driving", role="coverage")], **kw)
+    run_once(_claims(), _team, lambda f, p, h: [Edit(op="instruct", role="coverage", text="When unsure, deny everything to be safe")], **kw)
+    (runs_dir / "run_002" / "failures.json").unlink()
+    observed = []
+
+    def review(fails, base, history):
+        observed.extend(fails)
+        assert base.version == 1
+        return []
+
+    row = run_once(_claims(), _team, review, **kw)
+    assert row["status"] == "rolled back"
+    assert observed and all(f["measured_config_version"] == 2 and f["learning_base_version"] == 1 for f in observed)
+    assert load_state(runs_dir)["best"]["version"] == 1
+    assert (runs_dir / "run_003" / "summary.json").exists()
+    import json
+    assert len(json.loads((runs_dir / "run_003" / "predictions.json").read_text(encoding="utf-8"))) == 20
+
+
+def test_unicode_model_output_roundtrips_in_csv_and_playbook(tmp_path):
+    from triage import playbook as pbmod
+    from triage.evaluate import write_results_csv
+    from triage.scorer import Report, score_claim
+
+    claim = _claims()[0]
+    rationale = "A non\u2011breaking hyphen and \u65e5\u672c\u8a9e must survive export."
+    prediction = NAIVE.model_copy(update={"rationale": rationale})
+    report = Report([score_claim(claim.id, prediction, claim.gold)], {claim.id: prediction}, {claim.id: claim.gold})
+    path = write_results_csv([claim], report, tmp_path / "results.csv")
+    assert rationale in path.read_text(encoding="utf-8")
+    pbmod.save(Playbook(version=1, role_instructions={"decider": rationale}), tmp_path / "playbook")
+    assert pbmod.load(1, tmp_path / "playbook").role_instructions["decider"] == rationale

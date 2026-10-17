@@ -68,7 +68,7 @@ def write_results_csv(claims: list[Claim], report: Report, path: Path) -> Path:
     """dataset.csv columns with agent_outcome and evaluation filled in, plus the mistakes found."""
     scores = {s.claim_id: s for s in report.scores}
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["s.no", "state", "description", "expected_outcome_gold", "agent_outcome", "evaluation", "mistakes"])
         for c in claims:

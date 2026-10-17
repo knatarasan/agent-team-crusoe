@@ -57,7 +57,7 @@ def path_for(version: int, directory: Path = PLAYBOOK_DIR) -> Path:
 
 
 def load(version: int, directory: Path = PLAYBOOK_DIR) -> Playbook:
-    return Playbook.model_validate(yaml.safe_load(path_for(version, directory).read_text()))
+    return Playbook.model_validate(yaml.safe_load(path_for(version, directory).read_text(encoding="utf-8")))
 
 
 def dump(pb: Playbook) -> str:
@@ -67,7 +67,7 @@ def dump(pb: Playbook) -> str:
 def save(pb: Playbook, directory: Path = PLAYBOOK_DIR) -> Path:
     p = path_for(pb.version, directory)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(dump(pb))
+    p.write_text(dump(pb), encoding="utf-8")
     return p
 
 

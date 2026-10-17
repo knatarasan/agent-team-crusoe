@@ -1,0 +1,713 @@
+{
+  "schema": 1,
+  "origin": "Archived report · commit 1455bf4",
+  "recorded": true,
+  "claim_count": 50,
+  "held_out_evaluated": false,
+  "runs": [
+    {
+      "n": 1,
+      "version": 0,
+      "score": 0.906,
+      "exact": 0.48,
+      "denials": 4,
+      "status": "baseline",
+      "changes": "—",
+      "categories": {
+        "adjuster": 0.942,
+        "coverage_review": 0.593,
+        "deny": 1.0,
+        "fast_track": 0.992,
+        "siu": 0.812,
+        "subrogation": 0.925
+      },
+      "claims": 50,
+      "errors": null,
+      "usage": {},
+      "edits": []
+    },
+    {
+      "n": 2,
+      "version": 1,
+      "score": 0.957,
+      "exact": 0.58,
+      "denials": 0,
+      "status": "kept",
+      "changes": "add [coverage/all] When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off. ; add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off. ; add [coverage/all] When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+      "categories": {
+        "adjuster": 0.95,
+        "coverage_review": 0.893,
+        "deny": 1.0,
+        "fast_track": 0.992,
+        "siu": 0.912,
+        "subrogation": 0.925
+      },
+      "claims": 50,
+      "errors": null,
+      "usage": {},
+      "edits": []
+    },
+    {
+      "n": 3,
+      "version": 2,
+      "score": 0.93,
+      "exact": 0.6,
+      "denials": 2,
+      "status": "rolled back",
+      "changes": "add [decider/all] When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery. ; add [decider/all] When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault. ; add [fraud/all] When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review.",
+      "categories": {
+        "adjuster": 0.917,
+        "coverage_review": 0.779,
+        "deny": 1.0,
+        "fast_track": 0.997,
+        "siu": 0.738,
+        "subrogation": 0.956
+      },
+      "claims": 50,
+      "errors": null,
+      "usage": {},
+      "edits": []
+    },
+    {
+      "n": 4,
+      "version": 3,
+      "score": 0.956,
+      "exact": 0.66,
+      "denials": 0,
+      "status": "rolled back",
+      "changes": "add [decider/all] When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery. ; add [decider/all] When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault. ; add [fraud/all] When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review.",
+      "categories": {
+        "adjuster": 0.942,
+        "coverage_review": 0.921,
+        "deny": 1.0,
+        "fast_track": 1.0,
+        "siu": 0.8,
+        "subrogation": 0.938
+      },
+      "claims": 50,
+      "errors": null,
+      "usage": {},
+      "edits": []
+    }
+  ],
+  "configs": {
+    "0": {
+      "version": 0,
+      "rules": [],
+      "changelog": [
+        "v0: day-1 team. Base prompts only, no house rules."
+      ]
+    },
+    "1": {
+      "version": 1,
+      "rules": [
+        {
+          "id": "R1",
+          "text": "When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "27",
+            "28",
+            "29"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R2",
+          "text": "When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "37",
+            "25"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R3",
+          "text": "When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "42",
+            "41"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        }
+      ],
+      "role_instructions": {},
+      "changelog": [
+        "v0: day-1 team. Base prompts only, no house rules.",
+        "v1: proposed after run 1 on top of v0: add [coverage/all] When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off. | add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off. | add [coverage/all] When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision."
+      ]
+    },
+    "2": {
+      "version": 2,
+      "rules": [
+        {
+          "id": "R1",
+          "text": "When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "27",
+            "28",
+            "29"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R2",
+          "text": "When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "37",
+            "25"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R3",
+          "text": "When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "42",
+            "41"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R4",
+          "text": "When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery.",
+          "role": "decider",
+          "state": "all",
+          "source_claim_ids": [
+            "4",
+            "17",
+            "21",
+            "49",
+            "18",
+            "19"
+          ],
+          "added_in": 2,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R5",
+          "text": "When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault.",
+          "role": "decider",
+          "state": "all",
+          "source_claim_ids": [
+            "6",
+            "16"
+          ],
+          "added_in": 2,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R6",
+          "text": "When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review.",
+          "role": "fraud",
+          "state": "all",
+          "source_claim_ids": [
+            "32",
+            "3"
+          ],
+          "added_in": 2,
+          "status": "active",
+          "score_delta": null
+        }
+      ],
+      "role_instructions": {},
+      "changelog": [
+        "v0: day-1 team. Base prompts only, no house rules.",
+        "v1: proposed after run 1 on top of v0: add [coverage/all] When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off. | add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off. | add [coverage/all] When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+        "v2: proposed after run 2 on top of v1: add [decider/all] When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery. | add [decider/all] When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault. | add [fraud/all] When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review."
+      ]
+    },
+    "3": {
+      "version": 3,
+      "rules": [
+        {
+          "id": "R1",
+          "text": "When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "27",
+            "28",
+            "29"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R2",
+          "text": "When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "37",
+            "25"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R3",
+          "text": "When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "42",
+            "41"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R4",
+          "text": "When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery.",
+          "role": "decider",
+          "state": "all",
+          "source_claim_ids": [
+            "4",
+            "17",
+            "21",
+            "49",
+            "18",
+            "19"
+          ],
+          "added_in": 3,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R5",
+          "text": "When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault.",
+          "role": "decider",
+          "state": "all",
+          "source_claim_ids": [
+            "6",
+            "16"
+          ],
+          "added_in": 3,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R6",
+          "text": "When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review.",
+          "role": "fraud",
+          "state": "all",
+          "source_claim_ids": [
+            "32",
+            "3"
+          ],
+          "added_in": 3,
+          "status": "active",
+          "score_delta": null
+        }
+      ],
+      "role_instructions": {},
+      "changelog": [
+        "v0: day-1 team. Base prompts only, no house rules.",
+        "v1: proposed after run 1 on top of v0: add [coverage/all] When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off. | add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off. | add [coverage/all] When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+        "v3: proposed after run 3 on top of v1: add [decider/all] When a claim is not at fault and subrogation is pursued, do not apply the insured's deductible. The deductible must be included in the subrogation demand and refunded to the insured from the recovery. | add [decider/all] When a claim involves no injuries and clear liability, route to fast-track. Do not route to subrogation unless the insured is not at fault. | add [fraud/all] When a claim involves a rear-end collision where the lead vehicle braked suddenly with no apparent reason and multiple occupants report similar injuries treated at the same clinic, refer to SIU as a suspected staged accident. Do not concede 100% fault without SIU review."
+      ]
+    },
+    "4": {
+      "version": 4,
+      "rules": [
+        {
+          "id": "R1",
+          "text": "When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "27",
+            "28",
+            "29"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R2",
+          "text": "When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "37",
+            "25"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R3",
+          "text": "When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+          "role": "coverage",
+          "state": "all",
+          "source_claim_ids": [
+            "42",
+            "41"
+          ],
+          "added_in": 1,
+          "status": "active",
+          "score_delta": null
+        },
+        {
+          "id": "R4",
+          "text": "When the insured is not at fault and subrogation is pursued, do not apply the insured's deductible. Include the deductible in the subrogation demand and refund it to the insured from the recovery.",
+          "role": "decider",
+          "state": "all",
+          "source_claim_ids": [
+            "4",
+            "17",
+            "21",
+            "49",
+            "18",
+            "19"
+          ],
+          "added_in": 4,
+          "status": "active",
+          "score_delta": null
+        }
+      ],
+      "role_instructions": {},
+      "changelog": [
+        "v0: day-1 team. Base prompts only, no house rules.",
+        "v1: proposed after run 1 on top of v0: add [coverage/all] When a claim involves possible business use of a personal auto policy (delivery, rideshare, or any paid transport), never deny or fast-track. Route to coverage review with human sign-off. | add [coverage/all] When a policy cancellation or driver exclusion may be invalid due to missing notice or missing signature, do not deny or pay. Route to coverage review with human sign-off. | add [coverage/all] When a claim is reported more than 30 days after the loss, do not deny or pay. Route to coverage review with human sign-off before any payment decision.",
+        "v4: proposed after run 4 on top of v1: add [decider/all] When the insured is not at fault and subrogation is pursued, do not apply the insured's deductible. Include the deductible in the subrogation demand and refund it to the insured from the recovery."
+      ]
+    }
+  },
+  "claims": [
+    {
+      "id": "1",
+      "state": "CA",
+      "description": "Our insured rear-ended a sedan stopped at a red light at about 15 mph; no injuries and a police report was filed. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "2",
+      "state": "TX",
+      "description": "The insured's car rear-ended a pickup at a stop sign while being driven by the insured's nephew. The nephew is listed on the policy as an excluded driver, and the exclusion was signed by the named insured.",
+      "expected": "Deny both the liability and collision claims. The TX named-driver exclusion is valid because the named insured signed it. Send the excluded-driver letter. Route: human sign-off on the denial."
+    },
+    {
+      "id": "3",
+      "state": "TX",
+      "description": "Our insured rear-ended a hatchback after it braked hard for no apparent reason; the hatchback had 4 occupants. Days later all 4 reported neck pain and are being treated at the same clinic.",
+      "expected": "Covered, but refer to SIU as a suspected staged swoop-and-squat. TX has no automatic rear-driver fault presumption, so do not concede 100% fault; the sudden braking supports a comparative-fault argument. Report suspected fraud to the TX Dept of Insurance. Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "4",
+      "state": "CA",
+      "description": "Our insured was stopped in traffic when another driver rear-ended them; the other driver admitted fault in the police report. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Not at fault. Pay our insured's collision claim now and pursue subrogation against the other carrier. CA requires the $500 deductible to be included in the subrogation demand and refunded to the insured from the recovery. Route: subrogation."
+    },
+    {
+      "id": "5",
+      "state": "CA",
+      "description": "Our insured rear-ended a minivan in a parking lot exit at low speed with no injuries. The policy was cancelled for non-payment 12 days before the crash, and the grace period is 10 days.",
+      "expected": "Deny: no coverage was in force on the date of loss, but only after confirming the CA-required 10-day notice of cancellation was mailed to the insured. If notice was not mailed, the policy is still in force: route to coverage review. Route: human sign-off on the denial."
+    },
+    {
+      "id": "6",
+      "state": "CA",
+      "description": "Our insured rear-ended a pickup that had slowed for a yellow light on a city street at about 20 mph; no injuries and a police report was filed. Policy is active with collision coverage and a $1,000 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $1,000 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "7",
+      "state": "TX",
+      "description": "Our insured rear-ended an SUV in stop-and-go freeway traffic at about 10 mph; both drivers said they were unhurt. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault: nothing suggests the lead car acted carelessly. Route: fast-track."
+    },
+    {
+      "id": "8",
+      "state": "CA",
+      "description": "Our insured bumped the car ahead in a drive-thru line at under 5 mph, cracking its rear bumper; no injuries. Policy is active with collision coverage and a $250 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $250 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "9",
+      "state": "TX",
+      "description": "Our insured looked down at the GPS and rear-ended a sedan waiting to turn left; no injuries and no airbags deployed. Policy is active with collision coverage and a $1,000 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $1,000 deductible. Insured 100% at fault: our insured admits being distracted. Route: fast-track."
+    },
+    {
+      "id": "10",
+      "state": "CA",
+      "description": "Our insured rear-ended a hatchback at a stop sign in light rain at about 12 mph; no injuries and a police report was filed. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "11",
+      "state": "TX",
+      "description": "Our insured rear-ended a pickup at a red light in a school zone at about 15 mph; nobody was hurt. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault: the pickup was lawfully stopped. Route: fast-track."
+    },
+    {
+      "id": "12",
+      "state": "CA",
+      "description": "Our insured rolled into the back of a car queued at a parking garage exit at about 5 mph; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "13",
+      "state": "TX",
+      "description": "Our insured rear-ended a minivan that stopped for a pedestrian in a crosswalk, at about 18 mph; no injuries were reported at the scene or afterwards. Policy is active with collision coverage and a $750 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $750 deductible. Insured 100% at fault: the minivan stopped lawfully for a pedestrian. Route: fast-track."
+    },
+    {
+      "id": "14",
+      "state": "CA",
+      "description": "Our insured was following too closely on a freeway off-ramp and rear-ended a sedan at about 20 mph; no injuries. Policy is active with collision coverage and a $1,000 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $1,000 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "15",
+      "state": "TX",
+      "description": "Our insured rear-ended a compact car at a four-way stop at about 8 mph, causing minor bumper damage; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault: the compact car was stopped as required. Route: fast-track."
+    },
+    {
+      "id": "16",
+      "state": "CA",
+      "description": "Our insured was commuting to work and rear-ended a delivery van stopped in traffic, at about 10 mph; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Commuting is personal use, not business use. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "17",
+      "state": "TX",
+      "description": "Our insured was stopped at a red light when another driver rear-ended them at about 20 mph; no injuries, and the other driver was cited. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Not at fault. Pay our insured's collision claim now, pursue subrogation against Party B's insurer, and refund the $500 deductible from the recovery. Route: subrogation."
+    },
+    {
+      "id": "18",
+      "state": "CA",
+      "description": "Our insured was waiting to turn right when another car rear-ended them at low speed; no injuries, and the other driver admitted looking at their phone. Policy is active with collision coverage and a $1,000 deductible.",
+      "expected": "Not at fault. Pay our insured's collision claim now and pursue subrogation against Party B's insurer. CA requires the $1,000 deductible to be included in the subrogation demand and refunded to the insured from the recovery. Route: subrogation."
+    },
+    {
+      "id": "19",
+      "state": "TX",
+      "description": "Our insured slowed for traffic on the highway and was rear-ended by a pickup at about 25 mph; no injuries. Policy is active with collision coverage and a $1,000 deductible, and the police report puts the pickup driver at fault.",
+      "expected": "Not at fault. Pay our insured's collision claim now, pursue subrogation against Party B's insurer, and refund the $1,000 deductible from the recovery. Route: subrogation."
+    },
+    {
+      "id": "20",
+      "state": "CA",
+      "description": "Our insured's car was parked at the curb with hazard lights on when another car rear-ended it; nobody was in our car and no one was hurt. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Not at fault. Pay our insured's collision claim now and pursue subrogation against Party B's insurer. CA requires the $500 deductible to be included in the subrogation demand and refunded to the insured from the recovery. Route: subrogation."
+    },
+    {
+      "id": "21",
+      "state": "TX",
+      "description": "Our insured stopped for a school bus and was rear-ended by a sedan at about 10 mph; no injuries. Policy is active with collision coverage and a $250 deductible.",
+      "expected": "Not at fault. Pay our insured's collision claim now, pursue subrogation against Party B's insurer, and refund the $250 deductible from the recovery. Route: subrogation."
+    },
+    {
+      "id": "22",
+      "state": "CA",
+      "description": "Our insured was stopped in traffic when Party B rear-ended them and pushed our car into the vehicle ahead; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Not at fault for the rear or the front damage: in a chain-reaction crash the middle car is pushed by the car behind. Pay our insured's collision claim now and pursue subrogation against Party B's insurer for all damage. CA requires the $500 deductible to be refunded to the insured from the recovery. Route: subrogation."
+    },
+    {
+      "id": "23",
+      "state": "CA",
+      "description": "The insured's son rear-ended a sedan at a stop light while driving the insured's car; no injuries. The son is listed on the policy as an excluded driver, and the exclusion form was signed by the named insured.",
+      "expected": "Deny both the liability and collision claims: the driver is a signed excluded driver. Send the excluded-driver letter. Route: human sign-off on the denial."
+    },
+    {
+      "id": "24",
+      "state": "TX",
+      "description": "The insured's roommate borrowed the car and rear-ended an SUV on the freeway; no injuries. The roommate is a named excluded driver on the policy, and the exclusion was signed by the named insured.",
+      "expected": "Deny both the liability and collision claims: the driver is a signed excluded driver. Send the excluded-driver letter. Route: human sign-off on the denial."
+    },
+    {
+      "id": "25",
+      "state": "CA",
+      "description": "The insured's daughter rear-ended a pickup in a shopping-center parking lot; no injuries. She is named as an excluded driver on the policy, but the exclusion form in the file was never signed by the named insured.",
+      "expected": "Coverage question: the excluded-driver exclusion is not valid without the named insured's signature. Do not deny; route to coverage review with human sign-off."
+    },
+    {
+      "id": "26",
+      "state": "TX",
+      "description": "The insured's brother rear-ended a car at a red light while driving the insured's truck; no injuries. The brother is listed as an excluded driver, and the signed exclusion is on file.",
+      "expected": "Deny both the liability and collision claims: the driver is a signed excluded driver. Send the excluded-driver letter. Route: human sign-off on the denial."
+    },
+    {
+      "id": "27",
+      "state": "CA",
+      "description": "Our insured rear-ended a sedan while on a food-delivery run with the delivery app on; no injuries. The policy is a personal auto policy with collision coverage and no delivery or rideshare endorsement.",
+      "expected": "Coverage question under the business-use exclusion: the car was being used for paid delivery without an endorsement. Do not pay or deny yet; route to coverage review with human sign-off, never fast-track."
+    },
+    {
+      "id": "28",
+      "state": "TX",
+      "description": "Our insured was delivering groceries for an app-based service, with the app on, when they rear-ended a hatchback; no injuries. Personal auto policy with collision coverage and no delivery endorsement.",
+      "expected": "Coverage question under the business-use exclusion: the car was being used for paid delivery without an endorsement. Do not pay or deny yet; route to coverage review with human sign-off, never fast-track."
+    },
+    {
+      "id": "29",
+      "state": "CA",
+      "description": "Our insured was driving for a rideshare app with a passenger on board and rear-ended a pickup at about 10 mph; no injuries. Personal auto policy with collision coverage and no rideshare endorsement.",
+      "expected": "Coverage question under the business-use exclusion: the car was carrying a paying rideshare passenger without an endorsement. Route to coverage review with human sign-off, never fast-track."
+    },
+    {
+      "id": "30",
+      "state": "TX",
+      "description": "Our insured rear-ended a sedan while on a food-delivery run with the app on; no injuries. The policy has collision coverage with a $500 deductible and a delivery endorsement covering app-based delivery.",
+      "expected": "Covered: the delivery endorsement removes the business-use exclusion. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault. Route: fast-track."
+    },
+    {
+      "id": "31",
+      "state": "CA",
+      "description": "Our insured rear-ended an SUV while delivering takeout with the app on; no injuries. The policy includes a delivery endorsement and collision coverage with a $500 deductible.",
+      "expected": "Covered: the delivery endorsement removes the business-use exclusion. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "32",
+      "state": "CA",
+      "description": "Our insured rear-ended a sedan that braked suddenly on an open road with no traffic ahead; the sedan carried 3 passengers. A week later the driver and all 3 passengers reported back pain and are treating at the same chiropractic clinic.",
+      "expected": "Covered, but refer to SIU as a suspected staged swoop-and-squat. CA presumes the following driver negligent, so treat our insured as 100% at fault pending the SIU review. Report suspected fraud to the CA Dept of Insurance. Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "33",
+      "state": "TX",
+      "description": "Our insured rear-ended an older sedan that slammed on its brakes right after merging in front of them; the sedan had 4 occupants. All 4 reported neck and back pain 5 days later and share the same attorney and clinic.",
+      "expected": "Covered, but refer to SIU as a suspected staged swoop-and-squat. TX has no automatic rear-driver fault presumption, so do not concede 100% fault; the sudden stop after merging supports a 50% comparative-fault position. Report suspected fraud to the TX Dept of Insurance. Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "34",
+      "state": "CA",
+      "description": "Our insured rear-ended a car that cut in and stopped short at an on-ramp with no traffic ahead; its 4 occupants all reported soft-tissue injuries days later and were referred to the same clinic.",
+      "expected": "Covered, but refer to SIU as a suspected staged swoop-and-squat. CA presumes the following driver negligent, so treat our insured as 100% at fault pending the SIU review. Report suspected fraud to the CA Dept of Insurance. Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "35",
+      "state": "TX",
+      "description": "Our insured rear-ended a sedan at a stop light; no injuries. The policy was cancelled for non-payment 20 days before the crash with a 10-day grace period, and the cancellation notice was mailed to the insured 30 days before the crash.",
+      "expected": "Deny: no coverage was in force on the date of loss. The cancellation notice was mailed and the grace period had ended. Route: human sign-off on the denial."
+    },
+    {
+      "id": "36",
+      "state": "CA",
+      "description": "Our insured rear-ended a pickup in traffic; no injuries. The policy was cancelled for non-payment 8 days before the crash, the grace period is 10 days, and the policy had collision coverage with a $500 deductible.",
+      "expected": "Covered: the crash fell within the 10-day grace period, so the policy was still in force. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "37",
+      "state": "TX",
+      "description": "Our insured rear-ended a hatchback at a red light; no injuries. The policy was cancelled for non-payment 15 days before the crash with a 10-day grace period, but the file shows no cancellation notice was mailed.",
+      "expected": "Coverage question: without a mailed cancellation notice, the cancellation may not be effective. Do not deny; route to coverage review with human sign-off."
+    },
+    {
+      "id": "38",
+      "state": "CA",
+      "description": "Our insured rear-ended a sedan at a stop sign at about 10 mph; no injuries. The policy is liability-only with no collision coverage.",
+      "expected": "Pay the other car under property-damage liability. Our insured's own car is not covered (no collision coverage), so no deductible applies. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "39",
+      "state": "TX",
+      "description": "Our insured rear-ended a pickup in a parking lot exit lane; no injuries. The policy carries state-minimum liability only, with no collision coverage.",
+      "expected": "Pay the other car under property-damage liability. Our insured's own car is not covered (no collision coverage), so no deductible applies. Insured 100% at fault. Route: fast-track."
+    },
+    {
+      "id": "40",
+      "state": "CA",
+      "description": "Our insured rear-ended a minivan at a red light at about 15 mph; no injuries. The policy has liability coverage only; the insured dropped collision coverage last year.",
+      "expected": "Pay the other car under property-damage liability. Our insured's own car is not covered (no collision coverage), so no deductible applies. Insured 100% at fault (CA presumes the following driver negligent). Route: fast-track."
+    },
+    {
+      "id": "41",
+      "state": "TX",
+      "description": "Our insured rear-ended an SUV at a red light; no injuries. The insured first reported the crash 45 days after it happened; the policy is active with collision coverage.",
+      "expected": "Coverage question: the claim was reported more than 30 days after the loss. Route to coverage review with human sign-off before any payment."
+    },
+    {
+      "id": "42",
+      "state": "CA",
+      "description": "Our insured rear-ended a sedan in a parking lot and first reported it 38 days later, after the other driver sent a repair bill; no injuries. The policy is active with collision coverage.",
+      "expected": "Coverage question: the claim was reported more than 30 days after the loss. Route to coverage review with human sign-off before any payment."
+    },
+    {
+      "id": "43",
+      "state": "CA",
+      "description": "Our insured rear-ended a pickup at about 40 mph on a highway and both front airbags deployed; both drivers were checked at the scene and declined treatment. Policy is active with collision coverage and a $500 deductible, and the repair estimate is $18,500.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Airbag deployment and a large estimate mean a field appraiser and a total-loss check. Route: adjuster."
+    },
+    {
+      "id": "44",
+      "state": "TX",
+      "description": "Our insured rear-ended a box truck at about 35 mph; no injuries, but the front end is crushed and the shop estimate is $14,000 on a 9-year-old car. Policy is active with collision coverage and a $1,000 deductible.",
+      "expected": "Covered. Pay the other vehicle under property-damage liability and our insured's car under collision minus the $1,000 deductible. Insured 100% at fault. The large estimate on an older car means a field appraiser and a total-loss check. Route: adjuster."
+    },
+    {
+      "id": "45",
+      "state": "TX",
+      "description": "Our insured rear-ended a sedan at about 25 mph at a red light; the other driver went to the ER that evening with neck pain. Policy is active with collision coverage and a $500 deductible, with no other red flags.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault. Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "46",
+      "state": "CA",
+      "description": "Our insured rear-ended a hatchback in stop-and-go traffic; our insured's passenger hit the dashboard and was treated for a wrist injury. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault (CA presumes the following driver negligent). Injury claim, so route to an adjuster, never fast-track."
+    },
+    {
+      "id": "47",
+      "state": "CA",
+      "description": "Our insured was creeping forward behind a sedan at a stop sign when the sedan suddenly reversed into our insured's front bumper; no injuries. A witness confirmed the sedan backed up, and the policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. The rear-driver presumption is weakened because the lead car was reversing: treat our insured as 50% at fault. Pay the other car's damage at 50% under property-damage liability, pay our insured's car under collision minus the $500 deductible, and pursue 50% subrogation against Party B's insurer. Disputed liability, so route to an adjuster."
+    },
+    {
+      "id": "48",
+      "state": "TX",
+      "description": "Our insured rear-ended a pickup at night whose brake lights were not working, as noted in the police report; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Dead brake lights weaken the case against the rear driver: treat our insured as 50% at fault. Under the TX 51% bar the pickup driver can still recover, so pay their damage at 50% under property-damage liability, pay our insured's car under collision minus the $500 deductible, and pursue 50% subrogation against Party B's insurer. Disputed liability, so route to an adjuster."
+    },
+    {
+      "id": "49",
+      "state": "TX",
+      "description": "Our insured was stopped in a line of traffic when Party B rear-ended them and pushed our car into the vehicle ahead; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Not at fault for the rear or the front damage: in a chain-reaction crash the middle car is pushed by the car behind. Pay our insured's collision claim now, pursue subrogation against Party B's insurer for all damage, and refund the $500 deductible from the recovery. Route: subrogation."
+    },
+    {
+      "id": "50",
+      "state": "TX",
+      "description": "Our insured rear-ended a sedan in a toll plaza lane at about 10 mph; no injuries. Policy is active with collision coverage and a $500 deductible.",
+      "expected": "Covered. Pay the other car under property-damage liability and our insured's car under collision minus the $500 deductible. Insured 100% at fault: the sedan was stopped to pay the toll. Route: fast-track."
+    }
+  ],
+  "pending_version": 4,
+  "threshold": null,
+  "source": "git show 1455bf4:reports/history.md"
+}

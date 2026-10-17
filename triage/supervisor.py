@@ -49,6 +49,9 @@ Rules for good edits:
 - Fix the most expensive mistakes first: wrongful denial > missed fraud / wrongful payment > injury fast-tracked
   > missed subrogation > the rest.
 - Learn from history: do not re-propose edits that were rolled back; build on edits that were kept.
+- A failure may identify a measured_config_version different from the current config after a rollback.
+  In that case it is an observation from that tested candidate, not a measured failure of the retained config.
+  Account for the tested edits in history before proposing a change to the retained config.
 - Never use protected attributes or proxies for them (ZIP code, neighbourhood, race, gender, age, religion, credit score).
 
 Reply with JSON only:

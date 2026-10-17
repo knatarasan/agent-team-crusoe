@@ -90,6 +90,12 @@ def cmd_eval(args):
     print(f"Scored CSV: {path}")
 
 
+def cmd_dashboard(args):
+    from triage.demo import serve
+
+    serve(port=args.port, export_only=args.export_only)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="triage", description=__doc__)
     p.add_argument("--workers", type=int, default=WORKERS, help="parallel claims")
@@ -109,6 +115,11 @@ def main(argv=None):
     r.set_defaults(fn=cmd_run)
 
     sub.add_parser("history", help="run-by-run table and chart -> reports/history.md").set_defaults(fn=cmd_history)
+
+    d = sub.add_parser("dashboard", help="interactive demo of saved runs; no inference calls")
+    d.add_argument("--port", type=int, default=8765)
+    d.add_argument("--export-only", action="store_true", help="write reports/demo/index.html without starting a server")
+    d.set_defaults(fn=cmd_dashboard)
 
     e = sub.add_parser("eval", help="score one config version on all claims (no learning)")
     e.add_argument("--version", type=int, help="config version (default: latest)")

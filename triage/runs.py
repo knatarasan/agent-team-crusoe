@@ -100,19 +100,33 @@ def _run(claims, triage_fn, propose_fn, threshold, workers, runs_dir, playbook_d
     log.info("best config is now v%d from run %d (%.3f)", best["version"], best["run"], best["score"])
 
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "config.yaml").write_text(pbmod.dump(config))
+    (run_dir / "config.yaml").write_text(pbmod.dump(config), encoding="utf-8")
+    # Persist scored fields and rationale before presentation/export can fail.
+    (run_dir / "predictions.json").write_text(
+        json.dumps({cid: pred.model_dump() for cid, pred in report.preds.items()}, ensure_ascii=False, indent=2),
+        encoding="utf-8")
     write_results_csv(claims, report, run_dir / "results.csv")
     (run_dir / "failures.json").write_text(json.dumps(fails, indent=1))
 
     # 3. Propose the next config on top of the best one, learning from the best run's mistakes.
     section(log, "Phase 3/3  supervisor proposes the next config")
     base = pbmod.load(best["version"], playbook_dir)
-    base_fails = fails if best["run"] == run_no else json.loads(
-        (runs_dir / f"run_{best['run']:03d}" / "failures.json").read_text())
+    base_failure_path = runs_dir / f"run_{best['run']:03d}" / "failures.json"
+    if best["run"] == run_no:
+        base_fails = fails
+    elif base_failure_path.exists():
+        base_fails = json.loads(base_failure_path.read_text())
+    else:
+        # Restored summary-only histories have no old per-claim predictions.
+        # Use measured current failures, explicitly identifying the tested config.
+        base_fails = [{**failure, "measured_config_version": config.version,
+                       "learning_base_version": base.version} for failure in fails]
+        log.warning("run %d has no retained failure trace; supervisor will review current v%d observations "
+                    "while proposing on retained v%d", best["run"], config.version, base.version)
     proposed, rejected = [], []
     if base_fails:
-        log.info("asking the supervisor: %d claims with mistakes in run %d, %d past edit batches in history",
-                 len(base_fails), best["run"], len(state["edit_history"]))
+        log.info("asking the supervisor: %d observed claim failures, learning base v%d, %d past edit batches in history",
+                 len(base_fails), base.version, len(state["edit_history"]))
         t0 = time.perf_counter()
         edits = propose_fn(base_fails, base, state["edit_history"])
         log.info("supervisor replied with %d edit(s) in %.0fs", len(edits), time.perf_counter() - t0)
@@ -150,13 +164,13 @@ def _run(claims, triage_fn, propose_fn, threshold, workers, runs_dir, playbook_d
             log.info("no usable edits; run %d will re-run config v%d", run_no + 1, base.version)
     else:
         state["next_version"] = base.version
-        log.info("no mistakes left; nothing to propose")
+        log.info("no observed mistakes available; nothing to propose")
 
     usage = _usage_delta(usage_before)
     summary.update(run=run_no, config_version=config.version, status=status, best=best, usage=usage)
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     (run_dir / "changes.md").write_text(_changes_md(run_no, config.version, status, tested, best, summary,
-                                                    proposed, rejected, state["next_version"]))
+                                                    proposed, rejected, state["next_version"]), encoding="utf-8")
 
     state.update(runs=run_no, best=best, pending_edits=proposed)
     (runs_dir / "state.json").write_text(json.dumps(state, indent=2))
@@ -168,7 +182,7 @@ def _run(claims, triage_fn, propose_fn, threshold, workers, runs_dir, playbook_d
     }
     history = runs_dir / "history.csv"
     new_file = not history.exists()
-    with history.open("a", newline="") as f:
+    with history.open("a", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, HISTORY_FIELDS)
         if new_file:
             w.writeheader()
@@ -226,7 +240,7 @@ def _changes_md(run_no, version, status, tested, best, summary, proposed, reject
 
 def read_history(runs_dir: Path = RUNS_DIR) -> list[dict]:
     p = runs_dir / "history.csv"
-    return list(csv.DictReader(p.open())) if p.exists() else []
+    return list(csv.DictReader(p.open(encoding="utf-8"))) if p.exists() else []
 
 
 def history_report(runs_dir: Path = RUNS_DIR, out: Path = REPORTS_DIR / "history.md") -> str:
@@ -259,6 +273,6 @@ def history_report(runs_dir: Path = RUNS_DIR, out: Path = REPORTS_DIR / "history
         lines += [f"| {k} | " + " | ".join(str(v.get(x, "—")) for x in runs) + " |" for k, v in sorted(cats.items())]
     text = "\n".join(lines) + "\n"
     out.parent.mkdir(exist_ok=True)
-    out.write_text(text)
+    out.write_text(text, encoding="utf-8")
     build_dashboard(runs_dir, out.parent / "dashboard.html")
     return text

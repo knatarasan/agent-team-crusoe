@@ -14,7 +14,7 @@ STATUS_COLOR = {"baseline": "var(--muted)", "kept": "var(--good)", "rolled back"
 
 
 def _read_csv(p: Path) -> list[dict]:
-    return list(csv.DictReader(p.open())) if p.exists() else []
+    return list(csv.DictReader(p.open(encoding="utf-8"))) if p.exists() else []
 
 
 def _load_runs(runs_dir: Path) -> list[dict]:
@@ -159,7 +159,7 @@ def _best_config(state: dict, playbook_dir: Path) -> str:
     p = playbook_dir / f"v{best['version']}.yaml"
     if not p.exists():
         return ""
-    cfg = yaml.safe_load(p.read_text())
+    cfg = yaml.safe_load(p.read_text(encoding="utf-8"))
     rules = [r for r in cfg.get("rules", []) if r.get("status") == "active"]
     rows = "".join(f"<tr><td>{escape(r['id'])}</td><td>{escape(r['role'])}</td><td>{escape(r['state'])}</td>"
                    f"<td>{escape(r['text'])}</td></tr>" for r in rules) or "<tr><td colspan='4' class='muted'>No rules yet.</td></tr>"
